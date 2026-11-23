@@ -1,9 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Crown, Bot, UserPlus, Play, Settings, X, ShieldAlert, Sparkles, Plus, Zap } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  Crown,
+  Bot,
+  UserPlus,
+  Play,
+  Settings,
+  X,
+  ShieldAlert,
+  Sparkles,
+  Plus,
+  Zap,
+  Tag,
+  CheckSquare,
+  Square,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { ClientGameState, GameSettings } from '../types/game';
-import { CATEGORIES } from '../lib/wordBank';
+import { CATEGORIES_LIST, ALL_CATEGORY_NAMES } from '../lib/wordBank';
 
 interface LobbyScreenProps {
   gameState: ClientGameState;
@@ -30,6 +47,8 @@ export function LobbyScreen({
   const canStart = playerCount >= 3;
   const botsCount = gameState.players.filter((p) => p.isBot).length;
 
+  const enabledCategories = gameState.settings.enabledCategories || ALL_CATEGORY_NAMES;
+
   const copyCode = () => {
     navigator.clipboard.writeText(gameState.code);
     setCopied(true);
@@ -41,6 +60,23 @@ export function LobbyScreen({
     for (let i = 0; i < needed; i++) {
       setTimeout(() => onAddBot(), i * 180);
     }
+  };
+
+  const toggleCategory = (catName: string) => {
+    if (!isHost) return;
+    let next: string[];
+    if (enabledCategories.includes(catName)) {
+      if (enabledCategories.length <= 1) return; // Keep at least 1 category
+      next = enabledCategories.filter((c) => c !== catName);
+    } else {
+      next = [...enabledCategories, catName];
+    }
+    onUpdateSettings({ enabledCategories: next });
+  };
+
+  const selectAllCategories = () => {
+    if (!isHost) return;
+    onUpdateSettings({ enabledCategories: [...ALL_CATEGORY_NAMES] });
   };
 
   return (
@@ -125,6 +161,87 @@ export function LobbyScreen({
         </div>
       )}
 
+      {/* Word Categories Selection Section */}
+      <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 bg-amber-500/20 text-amber-300 rounded-lg border border-amber-500/30">
+              <Tag className="w-4 h-4" />
+            </span>
+            <div>
+              <h3 className="font-bold text-slate-100 text-sm sm:text-base flex items-center gap-2">
+                <span>Secret Word Categories</span>
+                <span className="text-xs font-semibold px-2 py-0.5 bg-slate-800 text-amber-300 rounded-full border border-slate-700">
+                  {enabledCategories.length} Active
+                </span>
+              </h3>
+            </div>
+          </div>
+
+          {isHost && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={selectAllCategories}
+                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Select All
+              </button>
+            </div>
+          )}
+        </div>
+
+        <p className="text-xs text-slate-400 mb-3">
+          {isHost
+            ? 'Toggle categories on or off below based on your group’s interests and knowledge:'
+            : 'Active categories chosen by the host for this match:'}
+        </p>
+
+        {/* Categories Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
+          {CATEGORIES_LIST.map((cat) => {
+            const isEnabled = enabledCategories.includes(cat.name);
+            return (
+              <button
+                key={cat.name}
+                type="button"
+                disabled={!isHost}
+                onClick={() => toggleCategory(cat.name)}
+                className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-2.5 ${
+                  isEnabled
+                    ? 'bg-slate-800/90 border-slate-700 hover:border-indigo-500/60 shadow-sm'
+                    : 'bg-slate-950/40 border-slate-800/60 opacity-50'
+                } ${isHost ? 'cursor-pointer hover:scale-[1.01]' : 'cursor-default'}`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-2xl shrink-0">{cat.icon}</span>
+                  <div className="min-w-0">
+                    <div className="font-bold text-xs sm:text-sm text-slate-100 truncate">
+                      {cat.name}
+                    </div>
+                    <div className="text-[10px] text-slate-400 truncate hidden sm:block">
+                      {cat.description}
+                    </div>
+                  </div>
+                </div>
+
+                {isHost && (
+                  <div
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                      isEnabled
+                        ? 'bg-indigo-600 border-indigo-400 text-white'
+                        : 'border-slate-700 bg-slate-800/60 text-transparent'
+                    }`}
+                  >
+                    {isEnabled && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Players Section */}
       <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -146,7 +263,7 @@ export function LobbyScreen({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors border border-slate-700"
             >
               <Settings className="w-3.5 h-3.5" />
-              <span>Settings</span>
+              <span>Timers</span>
             </button>
           )}
         </div>
@@ -251,14 +368,14 @@ export function LobbyScreen({
         )}
       </div>
 
-      {/* Settings Modal */}
+      {/* Settings Modal (Timers) */}
       {showSettingsModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
                 <Settings className="w-5 h-5 text-indigo-400" />
-                <span>Game Settings</span>
+                <span>Round Timer Settings</span>
               </h3>
               <button
                 onClick={() => setShowSettingsModal(false)}
@@ -269,24 +386,6 @@ export function LobbyScreen({
             </div>
 
             <div className="space-y-4">
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  Word Category
-                </label>
-                <select
-                  value={gameState.settings.category}
-                  onChange={(e) => onUpdateSettings({ category: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* Clue Time */}
               <div>
                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -309,13 +408,36 @@ export function LobbyScreen({
                   ))}
                 </div>
               </div>
+
+              {/* Vote Time */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  Voting Time
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[30, 40, 60].map((sec) => (
+                    <button
+                      key={sec}
+                      type="button"
+                      onClick={() => onUpdateSettings({ voteTime: sec })}
+                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                        gameState.settings.voteTime === sec
+                          ? 'bg-indigo-600 border-indigo-400 text-white'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      }`}
+                    >
+                      {sec} seconds
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <button
               onClick={() => setShowSettingsModal(false)}
               className="mt-6 w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors"
             >
-              Save Settings
+              Done
             </button>
           </div>
         </div>

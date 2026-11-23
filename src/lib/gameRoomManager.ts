@@ -1,5 +1,5 @@
 import { GameRoom, Player, GameSettings, ClientGameState, RoundClueRecord } from '../types/game';
-import { getRandomWord } from './wordBank';
+import { getRandomWord, ALL_CATEGORY_NAMES } from './wordBank';
 import { createBotPlayer, generateBotClue, pickBotVote } from './botEngine';
 
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -15,7 +15,7 @@ export function generateRoomCode(): string {
 export const DEFAULT_SETTINGS: GameSettings = {
   clueTime: 45,
   voteTime: 40,
-  category: 'All',
+  enabledCategories: [...ALL_CATEGORY_NAMES],
   imposterCount: 1,
   maxRounds: 3,
 };
@@ -145,7 +145,7 @@ export class GameRoomManager {
 
     // Pick random word
     const usedWordIds = room.history.map((h) => h.word);
-    const word = getRandomWord(room.settings.category, usedWordIds);
+    const word = getRandomWord(room.settings.enabledCategories, usedWordIds);
     room.currentWord = word;
 
     // Assign Imposter(s)

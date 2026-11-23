@@ -38,7 +38,7 @@ export interface GameWord {
 export interface GameSettings {
   clueTime: number; // in seconds
   voteTime: number; // in seconds
-  category: string; // 'All' or specific
+  enabledCategories: string[]; // Active categories chosen by host
   imposterCount: number; // 1 (or 2 for large groups)
   maxRounds: number; // default 3
 }

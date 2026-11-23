@@ -1,101 +1,143 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React from 'react';
+import { useSocketGame } from '../hooks/useSocketGame';
+import { Header, TimerBar } from '../components/Header';
+import { HomeScreen } from '../components/HomeScreen';
+import { LobbyScreen } from '../components/LobbyScreen';
+import { RoleRevealScreen } from '../components/RoleRevealScreen';
+import { ClueInputScreen } from '../components/ClueInputScreen';
+import { ClueShowcaseScreen } from '../components/ClueShowcaseScreen';
+import { VotingScreen } from '../components/VotingScreen';
+import { VoteResultsScreen } from '../components/VoteResultsScreen';
+import { ImposterGuessScreen } from '../components/ImposterGuessScreen';
+import { GameOverScreen } from '../components/GameOverScreen';
+
+export default function ImposterGamePage() {
+  const {
+    isConnected,
+    gameState,
+    timeLeft,
+    errorMsg,
+    createRoom,
+    joinRoom,
+    addBot,
+    removeBot,
+    updateSettings,
+    startGame,
+    proceedToClues,
+    submitClue,
+    proceedToVoting,
+    castVote,
+    submitImposterGuess,
+    proceedAfterResults,
+    playAgain,
+    leaveRoom,
+  } = useSocketGame();
+
+  const handleSoloPlay = (name: string, avatar: string, color: string) => {
+    createRoom(name, avatar, color);
+    // Add 3 AI bots automatically after room creation
+    setTimeout(() => {
+      addBot();
+      setTimeout(() => {
+        addBot();
+        setTimeout(() => {
+          addBot();
+        }, 200);
+      }, 200);
+    }, 400);
+  };
+
+  // If not inside a room, show Home / Join / Create / Solo
+  if (!gameState) {
+    return (
+      <HomeScreen
+        onCreateRoom={createRoom}
+        onJoinRoom={joinRoom}
+        onSoloPlay={handleSoloPlay}
+        errorMsg={errorMsg}
+      />
+    );
+  }
+
+  const currentPhase = gameState.phase;
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
+      {/* Top Header & Timer Bar */}
+      <Header gameState={gameState} timeLeft={timeLeft} onLeave={leaveRoom} isConnected={isConnected} />
+      <TimerBar timeLeft={timeLeft} totalTime={gameState.phaseDuration} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+        {currentPhase === 'LOBBY' && (
+          <LobbyScreen
+            gameState={gameState}
+            onAddBot={addBot}
+            onRemoveBot={removeBot}
+            onUpdateSettings={updateSettings}
+            onStartGame={startGame}
+            errorMsg={errorMsg}
+          />
+        )}
+
+        {currentPhase === 'ROLE_REVEAL' && (
+          <RoleRevealScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onProceed={proceedToClues}
+          />
+        )}
+
+        {currentPhase === 'CLUE_INPUT' && (
+          <ClueInputScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onSubmitClue={submitClue}
+          />
+        )}
+
+        {currentPhase === 'CLUE_SHOWCASE' && (
+          <ClueShowcaseScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onProceedToVoting={proceedToVoting}
+          />
+        )}
+
+        {currentPhase === 'VOTING' && (
+          <VotingScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onCastVote={castVote}
+          />
+        )}
+
+        {currentPhase === 'VOTE_RESULTS' && (
+          <VoteResultsScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onProceed={proceedAfterResults}
+          />
+        )}
+
+        {currentPhase === 'IMPOSTER_GUESS' && (
+          <ImposterGuessScreen
+            gameState={gameState}
+            timeLeft={timeLeft}
+            onSubmitGuess={submitImposterGuess}
+          />
+        )}
+
+        {currentPhase === 'GAME_OVER' && (
+          <GameOverScreen
+            gameState={gameState}
+            onPlayAgain={playAgain}
+            onLeave={leaveRoom}
+          />
+        )}
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }

@@ -93,6 +93,11 @@ app.prepare().then(() => {
     pingTimeout: 5000,
   });
 
+  // Automatically broadcast whenever game state updates internally (e.g. Bot turns)
+  gameManager.onRoomUpdate = (code: string) => {
+    broadcastRoom(io, code);
+  };
+
   io.on('connection', (socket: Socket) => {
     socketMeta.set(socket.id, {});
 
@@ -181,8 +186,15 @@ app.prepare().then(() => {
       scheduleRoomPhaseTimer(ioServer, code, seconds, () => {
         const room = gameManager.getRoom(code);
         if (room && room.phase === 'CLUE_INPUT') {
-          gameManager.proceedToClueShowcase(code);
-          scheduleShowcaseTimer(ioServer, code, 25);
+          const updated = gameManager.advanceActiveTurnOnTimeout(code);
+          if (updated) {
+            broadcastRoom(ioServer, code);
+            if (updated.phase === 'CLUE_SHOWCASE') {
+              scheduleShowcaseTimer(ioServer, code, 25);
+            } else if (updated.phase === 'CLUE_INPUT') {
+              scheduleClueTimer(ioServer, code, updated.settings.clueTime);
+            }
+          }
         }
       });
     }
@@ -229,13 +241,22 @@ app.prepare().then(() => {
     });
 
     // Submit Clue
-    socket.on('submitClue', ({ roomCode, playerId, clue }: { roomCode: string; playerId: string; clue: string }) => {
+    socket.on('submitClue', ({ roomCode, playerId, clue }: { roomCode: string; playerId: string; clue: string }, callback) => {
       const result = gameManager.submitClue(roomCode, playerId, clue);
+      if (result.error) {
+        if (typeof callback === 'function') callback({ success: false, error: result.error });
+        return;
+      }
+
+      if (typeof callback === 'function') callback({ success: true });
       if (result.room) {
         broadcastRoom(io, roomCode);
         if (result.allSubmitted) {
           clearRoomTimer(roomCode);
           scheduleShowcaseTimer(io, roomCode, 25);
+        } else {
+          clearRoomTimer(roomCode);
+          scheduleClueTimer(io, roomCode, result.room.settings.clueTime);
         }
       }
     });

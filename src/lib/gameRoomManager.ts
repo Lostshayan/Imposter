@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
 export class GameRoomManager {
   private rooms: Map<string, GameRoom> = new Map();
   private timers: Map<string, NodeJS.Timeout> = new Map();
+  public onRoomUpdate?: (code: string) => void;
 
   public getRoom(code: string): GameRoom | undefined {
     return this.rooms.get(code.toUpperCase());
@@ -57,6 +58,9 @@ export class GameRoomManager {
       players: [hostPlayer],
       currentWord: null,
       imposterIds: [],
+      turnOrder: [],
+      currentTurnIndex: 0,
+      currentTurnPlayerId: null,
       phaseEndTime: null,
       phaseDuration: 0,
       settings: { ...DEFAULT_SETTINGS },
@@ -184,6 +188,11 @@ export class GameRoomManager {
     if (!room) return undefined;
 
     room.phase = 'CLUE_INPUT';
+    const alivePlayers = room.players.filter((p) => p.isAlive);
+    room.turnOrder = alivePlayers.map((p) => p.id);
+    room.currentTurnIndex = 0;
+    room.currentTurnPlayerId = room.turnOrder[0] || null;
+
     room.phaseDuration = room.settings.clueTime;
     room.phaseEndTime = Date.now() + room.settings.clueTime * 1000;
 
@@ -195,46 +204,129 @@ export class GameRoomManager {
       p.votesReceived = 0;
     });
 
-    // Automatically schedule bot clues with staggered human-like delays
-    this.triggerBotClues(room);
+    // If first player is an AI bot, trigger their turn
+    this.checkAndTriggerActiveBotTurn(room);
 
     return room;
   }
 
-  private triggerBotClues(room: GameRoom) {
-    if (!room.currentWord) return;
-    const botPlayers = room.players.filter((p) => p.isBot && p.isAlive);
+  public checkAndTriggerActiveBotTurn(room: GameRoom) {
+    if (!room.currentTurnPlayerId || room.phase !== 'CLUE_INPUT' || !room.currentWord) return;
+    const activePlayer = room.players.find((p) => p.id === room.currentTurnPlayerId);
+    if (!activePlayer || !activePlayer.isBot || !activePlayer.isAlive) return;
 
-    botPlayers.forEach((bot, index) => {
-      const delayMs = 1500 + index * 1200 + Math.random() * 800;
-      setTimeout(() => {
-        const liveRoom = this.getRoom(room.code);
-        if (liveRoom && liveRoom.phase === 'CLUE_INPUT' && liveRoom.currentWord) {
-          const clue = generateBotClue(bot, liveRoom.currentWord);
-          this.submitClue(liveRoom.code, bot.id, clue);
-        }
-      }, delayMs);
-    });
+    // Realistic delay before bot submits (1.0s - 1.8s)
+    const delay = 1000 + Math.random() * 800;
+    setTimeout(() => {
+      const liveRoom = this.getRoom(room.code);
+      if (
+        liveRoom &&
+        liveRoom.phase === 'CLUE_INPUT' &&
+        liveRoom.currentTurnPlayerId === activePlayer.id &&
+        liveRoom.currentWord
+      ) {
+        const existingClues = liveRoom.players
+          .filter((p) => p.clue)
+          .map((p) => p.clue!.trim().toLowerCase());
+        const clue = generateBotClue(activePlayer, liveRoom.currentWord, existingClues);
+        this.submitClue(liveRoom.code, activePlayer.id, clue);
+      }
+    }, delay);
   }
 
-  public submitClue(code: string, playerId: string, clueText: string): { room?: GameRoom; allSubmitted?: boolean } {
+  public submitClue(
+    code: string,
+    playerId: string,
+    clueText: string
+  ): { room?: GameRoom; allSubmitted?: boolean; error?: string } {
     const room = this.getRoom(code);
-    if (!room || room.phase !== 'CLUE_INPUT') return {};
-
-    const player = room.players.find((p) => p.id === playerId);
-    if (!player || !player.isAlive) return {};
-
-    player.clue = clueText.trim();
-    player.hasSubmittedClue = true;
-
-    const alivePlayers = room.players.filter((p) => p.isAlive);
-    const allSubmitted = alivePlayers.every((p) => p.hasSubmittedClue);
-
-    if (allSubmitted) {
-      this.proceedToClueShowcase(room.code);
+    if (!room || room.phase !== 'CLUE_INPUT') {
+      return { error: 'Game is not in clue input phase' };
     }
 
-    return { room, allSubmitted };
+    if (room.currentTurnPlayerId !== playerId) {
+      const activePlayer = room.players.find((p) => p.id === room.currentTurnPlayerId);
+      return { error: `It is currently ${activePlayer?.name || 'another player'}'s turn to submit a clue!` };
+    }
+
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player || !player.isAlive) {
+      return { error: 'Player is not active' };
+    }
+
+    const trimmed = clueText.trim();
+    if (!trimmed) {
+      return { error: 'Please enter a clue before submitting' };
+    }
+
+    // CHECK FOR UNIQUENESS (no two inputs can be the same!)
+    const normalizedInput = trimmed.toLowerCase();
+    const duplicate = room.players.find(
+      (p) => p.clue && p.id !== playerId && p.clue.trim().toLowerCase() === normalizedInput
+    );
+    if (duplicate) {
+      return {
+        error: `The clue "${trimmed}" was already given by ${duplicate.name}! Every player must give a unique clue.`,
+      };
+    }
+
+    player.clue = trimmed;
+    player.hasSubmittedClue = true;
+
+    // Advance turn order
+    room.currentTurnIndex += 1;
+
+    if (room.currentTurnIndex >= room.turnOrder.length) {
+      // All players in the turn order have submitted!
+      room.currentTurnPlayerId = null;
+      this.proceedToClueShowcase(room.code);
+      this.onRoomUpdate?.(room.code);
+      return { room, allSubmitted: true };
+    } else {
+      // Advance to next player
+      room.currentTurnPlayerId = room.turnOrder[room.currentTurnIndex];
+      room.phaseDuration = room.settings.clueTime;
+      room.phaseEndTime = Date.now() + room.settings.clueTime * 1000;
+
+      // If next player is an AI bot, trigger their turn
+      this.checkAndTriggerActiveBotTurn(room);
+      this.onRoomUpdate?.(room.code);
+
+      return { room, allSubmitted: false };
+    }
+  }
+
+  public advanceActiveTurnOnTimeout(code: string): GameRoom | undefined {
+    const room = this.getRoom(code);
+    if (!room || room.phase !== 'CLUE_INPUT' || !room.currentTurnPlayerId) return undefined;
+
+    const activePlayer = room.players.find((p) => p.id === room.currentTurnPlayerId);
+    if (activePlayer && !activePlayer.hasSubmittedClue) {
+      const existingClues = room.players
+        .filter((p) => p.clue)
+        .map((p) => p.clue!.trim().toLowerCase());
+      let fallback = `(Turn skipped)`;
+      let count = 1;
+      while (existingClues.includes(fallback.toLowerCase())) {
+        count++;
+        fallback = `(Turn skipped #${count})`;
+      }
+      activePlayer.clue = fallback;
+      activePlayer.hasSubmittedClue = true;
+    }
+
+    room.currentTurnIndex += 1;
+    if (room.currentTurnIndex >= room.turnOrder.length) {
+      room.currentTurnPlayerId = null;
+      this.proceedToClueShowcase(room.code);
+    } else {
+      room.currentTurnPlayerId = room.turnOrder[room.currentTurnIndex];
+      room.phaseDuration = room.settings.clueTime;
+      room.phaseEndTime = Date.now() + room.settings.clueTime * 1000;
+      this.checkAndTriggerActiveBotTurn(room);
+    }
+
+    return room;
   }
 
   public proceedToClueShowcase(code: string): GameRoom | undefined {
@@ -567,6 +659,9 @@ export class GameRoomManager {
       mySecretWord,
       myHint,
       allClues,
+      turnOrder: room.turnOrder || [],
+      currentTurnIndex: room.currentTurnIndex || 0,
+      currentTurnPlayerId: room.currentTurnPlayerId || null,
       phaseEndTime: room.phaseEndTime,
       phaseDuration: room.phaseDuration,
       settings: room.settings,

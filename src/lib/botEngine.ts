@@ -37,30 +37,42 @@ export function createBotPlayer(existingBotsCount: number): Player {
   };
 }
 
-export function generateBotClue(bot: Player, currentWord: GameWord): string {
+export function generateBotClue(bot: Player, currentWord: GameWord, existingClues: string[] = []): string {
   const isImposter = bot.role === 'IMPOSTER';
+  const normalizedExisting = new Set(existingClues.map((c) => c.trim().toLowerCase()));
   
-  if (isImposter) {
-    const imposterClues = currentWord.fakeImposterClues && currentWord.fakeImposterClues.length > 0
-      ? currentWord.fakeImposterClues
-      : [
-          `Definitely related to ${currentWord.category.toLowerCase()}`,
-          'Something almost everyone recognizes',
-          'Very versatile and well-known',
-          'Quite popular across cultures',
-          'Has a distinct purpose',
-        ];
-    return imposterClues[Math.floor(Math.random() * imposterClues.length)];
-  } else {
-    const civClues = currentWord.fakeCivClues && currentWord.fakeCivClues.length > 0
-      ? currentWord.fakeCivClues
-      : [
-          `Key aspect of ${currentWord.word}`,
-          'Instantly recognizable detail',
-          'Classic characteristic',
-        ];
-    return civClues[Math.floor(Math.random() * civClues.length)];
+  const candidatePool = isImposter
+    ? [
+        ...(currentWord.fakeImposterClues && currentWord.fakeImposterClues.length > 0
+          ? currentWord.fakeImposterClues
+          : []),
+        `Very notable in ${currentWord.category.toLowerCase()}`,
+        'Something almost everyone recognizes',
+        'Has a prominent and distinct purpose',
+        'Quite iconic and widely discussed',
+        'Known for its recognizable presence',
+        'Found and celebrated across cultures',
+      ]
+    : [
+        ...(currentWord.fakeCivClues && currentWord.fakeCivClues.length > 0
+          ? currentWord.fakeCivClues
+          : []),
+        `Signature element of ${currentWord.word}`,
+        'Instantly recognizable trait',
+        'Key defining detail',
+        'Unmistakable characteristic',
+      ];
+
+  // Filter out any clues that match already submitted clues
+  const available = candidatePool.filter((c) => !normalizedExisting.has(c.trim().toLowerCase()));
+
+  if (available.length > 0) {
+    return available[Math.floor(Math.random() * available.length)];
   }
+
+  // Guaranteed fallback with persona attribution to guarantee no duplicate
+  const base = candidatePool[0] || 'Very distinct';
+  return `${base} (observed)`;
 }
 
 export function pickBotVote(

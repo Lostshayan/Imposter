@@ -144,13 +144,22 @@ export function useSocketGame() {
   }, [gameState?.code]);
 
   const submitClue = useCallback(
-    (clue: string) => {
+    (clue: string, onResult?: (res: { success: boolean; error?: string }) => void) => {
       if (!socketRef.current || !gameState?.code || !gameState.myPlayer) return;
-      socketRef.current.emit('submitClue', {
-        roomCode: gameState.code,
-        playerId: gameState.myPlayer.id,
-        clue,
-      });
+      socketRef.current.emit(
+        'submitClue',
+        {
+          roomCode: gameState.code,
+          playerId: gameState.myPlayer.id,
+          clue,
+        },
+        (res?: { success: boolean; error?: string }) => {
+          if (res && !res.success && res.error) {
+            setErrorMsg(res.error);
+          }
+          if (onResult && res) onResult(res);
+        }
+      );
     },
     [gameState?.code, gameState?.myPlayer]
   );

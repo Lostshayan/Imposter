@@ -70,6 +70,9 @@ export interface GameRoom {
   players: Player[];
   currentWord: GameWord | null;
   imposterIds: string[];
+  turnOrder: string[]; // Order of player IDs for clue submission
+  currentTurnIndex: number; // Current index in turnOrder
+  currentTurnPlayerId: string | null;
   phaseEndTime: number | null; // epoch timestamp
   phaseDuration: number; // seconds
   settings: GameSettings;
@@ -97,6 +100,9 @@ export interface ClientGameState {
   mySecretWord: string | null; // only present if civilian
   myHint: string | null; // only present if imposter
   allClues: RoundClueRecord[];
+  turnOrder: string[];
+  currentTurnIndex: number;
+  currentTurnPlayerId: string | null;
   phaseEndTime: number | null;
   phaseDuration: number;
   settings: GameSettings;

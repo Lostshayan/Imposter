@@ -191,6 +191,11 @@ export function useSocketGame() {
     socketRef.current.emit('playAgain', { roomCode: gameState.code });
   }, [gameState?.code]);
 
+  const resetScores = useCallback(() => {
+    if (!socketRef.current || !gameState?.code) return;
+    socketRef.current.emit('resetScores', { roomCode: gameState.code });
+  }, [gameState?.code]);
+
   const leaveRoom = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY_CODE);
     localStorage.removeItem(STORAGE_KEY_PLAYER_ID);
@@ -214,6 +219,7 @@ export function useSocketGame() {
     castVote,
     proceedAfterResults,
     playAgain,
+    resetScores,
     leaveRoom,
   };
 }

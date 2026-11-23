@@ -30,6 +30,7 @@ export default function ImposterGamePage() {
     castVote,
     proceedAfterResults,
     playAgain,
+    resetScores,
     leaveRoom,
   } = useSocketGame();
 
@@ -76,6 +77,7 @@ export default function ImposterGamePage() {
             onRemoveBot={removeBot}
             onUpdateSettings={updateSettings}
             onStartGame={startGame}
+            onResetScores={resetScores}
             errorMsg={errorMsg}
           />
         )}

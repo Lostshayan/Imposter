@@ -161,6 +161,7 @@ export class GameRoomManager {
       p.votedFor = null;
       p.votesReceived = 0;
       p.role = 'CIVILIAN';
+      p.lastScoreGain = 0;
     });
 
     const imposterIndices = new Set<number>();
@@ -461,10 +462,31 @@ export class GameRoomManager {
         if (wasImposter) {
           room.winner = 'CIVILIANS';
           room.winReason = `The Imposter (${eliminatedPlayer.name}) was discovered and voted out! Civilians win!`;
+          // Distribute points: Civilians who voted for the imposter get 100, other civilians get 50, imposter gets 0
+          room.players.forEach((p) => {
+            if (p.role === 'CIVILIAN') {
+              const votedForImposter = p.votedFor === eliminatedPlayer.id;
+              const gain = votedForImposter ? 100 : 50;
+              p.lastScoreGain = gain;
+              p.score = (p.score || 0) + gain;
+            } else {
+              p.lastScoreGain = 0;
+            }
+          });
         } else {
           // A Civilian was voted out by majority - game ends immediately!
           room.winner = 'IMPOSTER';
           room.winReason = `An innocent civilian (${eliminatedPlayer.name}) was wrongly voted out! The Imposter (${imposterNames}) deceived everyone and won!`;
+          // Distribute points: Imposter tricked the room and gets 200, civilians get 0
+          room.players.forEach((p) => {
+            if (p.role === 'IMPOSTER') {
+              const gain = 200;
+              p.lastScoreGain = gain;
+              p.score = (p.score || 0) + gain;
+            } else {
+              p.lastScoreGain = 0;
+            }
+          });
         }
 
         room.lastEliminated = {
@@ -530,8 +552,18 @@ export class GameRoomManager {
     // Nobody was eliminated (Tie vote or Skip)
     if (room.round >= room.settings.maxRounds) {
       room.winner = 'IMPOSTER';
-      room.winReason = `Tie votes reached max rounds! The Imposter survived undetected.`;
+      room.winReason = `Tie votes reached max rounds! The Imposter survived undetected across all rounds!`;
       room.phase = 'GAME_OVER';
+      // Imposter survived max rounds: gets 150 survival points
+      room.players.forEach((p) => {
+        if (p.role === 'IMPOSTER') {
+          const gain = 150;
+          p.lastScoreGain = gain;
+          p.score = (p.score || 0) + gain;
+        } else {
+          p.lastScoreGain = 0;
+        }
+      });
       return room;
     }
 
@@ -561,6 +593,18 @@ export class GameRoomManager {
       p.hasSubmittedClue = false;
       p.votedFor = null;
       p.votesReceived = 0;
+    });
+
+    return room;
+  }
+
+  public resetScores(code: string): GameRoom | undefined {
+    const room = this.getRoom(code);
+    if (!room) return undefined;
+
+    room.players.forEach((p) => {
+      p.score = 0;
+      p.lastScoreGain = 0;
     });
 
     return room;

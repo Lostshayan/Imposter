@@ -18,9 +18,12 @@ import {
   CheckSquare,
   Square,
   SlidersHorizontal,
+  Trophy,
+  RotateCcw,
 } from 'lucide-react';
 import { ClientGameState, GameSettings } from '../types/game';
 import { CATEGORIES_LIST, ALL_CATEGORY_NAMES } from '../lib/wordBank';
+import { Leaderboard } from './Leaderboard';
 
 interface LobbyScreenProps {
   gameState: ClientGameState;
@@ -28,6 +31,7 @@ interface LobbyScreenProps {
   onRemoveBot: (botId: string) => void;
   onUpdateSettings: (settings: Partial<GameSettings>) => void;
   onStartGame: () => void;
+  onResetScores?: () => void;
   errorMsg: string | null;
 }
 
@@ -37,6 +41,7 @@ export function LobbyScreen({
   onRemoveBot,
   onUpdateSettings,
   onStartGame,
+  onResetScores,
   errorMsg,
 }: LobbyScreenProps) {
   const [copied, setCopied] = useState(false);
@@ -288,7 +293,7 @@ export function LobbyScreen({
                       <span className="text-[10px] text-indigo-400 font-bold">(You)</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5">
+                  <div className="flex items-center gap-1.5 mt-0.5">
                     {player.isHost && (
                       <span className="flex items-center gap-0.5 text-[10px] font-semibold text-amber-400">
                         <Crown className="w-3 h-3" /> Host
@@ -299,6 +304,10 @@ export function LobbyScreen({
                         <Bot className="w-3 h-3" /> AI Bot
                       </span>
                     )}
+                    <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-300 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                      <Trophy className="w-2.5 h-2.5 text-amber-400" />
+                      {player.score || 0} pts
+                    </span>
                   </div>
                 </div>
               </div>
@@ -348,6 +357,35 @@ export function LobbyScreen({
           </div>
         )}
       </div>
+
+      {/* Tournament Standings in Lobby (if any games have concluded) */}
+      {gameState.players.some((p) => (p.score || 0) > 0) && (
+        <div className="w-full mb-6">
+          <Leaderboard
+            players={gameState.players}
+            myPlayerId={gameState.myPlayer?.id}
+            showRecentGain={false}
+            title="Tournament Leaderboard"
+            subtitle="Current cumulative standings across games played in this room"
+          />
+          {isHost && onResetScores && (
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Reset all tournament scores to 0 for this room?')) {
+                    onResetScores();
+                  }
+                }}
+                className="text-[11px] text-slate-500 hover:text-rose-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-rose-500/10"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Tournament Scores</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Start Button / Waiting Banner */}
       <div className="w-full">

@@ -18,6 +18,7 @@ export interface Player {
   isBot: boolean;
   isAlive: boolean;
   score: number;
+  lastScoreGain?: number; // points earned in the most recent round
   role: PlayerRole;
   clue: string | null;
   hasSubmittedClue: boolean;

@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Trophy, RotateCcw, Home, Sparkles, ShieldCheck, Skull } from 'lucide-react';
 import { ClientGameState } from '../types/game';
+import { Leaderboard } from './Leaderboard';
 
 interface GameOverScreenProps {
   gameState: ClientGameState;
@@ -110,6 +111,17 @@ export function GameOverScreen({ gameState, onPlayAgain, onLeave }: GameOverScre
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Tournament Leaderboard */}
+      <div className="w-full mb-6">
+        <Leaderboard
+          players={gameState.players}
+          myPlayerId={gameState.myPlayer?.id}
+          showRecentGain={true}
+          title="Overall Tournament Leaderboard"
+          subtitle="Cumulative points across games • Continue to next game to keep climbing!"
+        />
       </div>
 
       {/* Roster & Final Role Reveal */}

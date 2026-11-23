@@ -304,6 +304,14 @@ app.prepare().then(() => {
       }
     });
 
+    // Reset Tournament Scores (Host)
+    socket.on('resetScores', ({ roomCode }: { roomCode: string }) => {
+      const room = gameManager.resetScores(roomCode);
+      if (room) {
+        broadcastRoom(io, roomCode);
+      }
+    });
+
     // Client reconnect / sync request
     socket.on('syncState', ({ roomCode, playerId }: { roomCode: string; playerId: string }, callback) => {
       socket.join(roomCode);

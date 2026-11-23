@@ -3,6 +3,7 @@
 import React from 'react';
 import { ArrowRight, Users, ShieldAlert, Sparkles, Skull } from 'lucide-react';
 import { ClientGameState } from '../types/game';
+import { Leaderboard } from './Leaderboard';
 
 interface VoteResultsScreenProps {
   gameState: ClientGameState;
@@ -143,6 +144,17 @@ export function VoteResultsScreen({ gameState, timeLeft, onProceed }: VoteResult
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Leaderboard & Round Points */}
+      <div className="w-full mb-6">
+        <Leaderboard
+          players={players}
+          myPlayerId={gameState.myPlayer?.id}
+          showRecentGain={true}
+          title="Round Standings & Points"
+          subtitle="Points awarded based on this round's voting results"
+        />
       </div>
 
       {/* Advance Button */}

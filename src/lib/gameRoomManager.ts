@@ -1,6 +1,6 @@
 import { GameRoom, Player, GameSettings, ClientGameState, RoundClueRecord } from '../types/game';
 import { getRandomWord } from './wordBank';
-import { createBotPlayer, generateBotClue, pickBotVote, pickBotImposterGuess } from './botEngine';
+import { createBotPlayer, generateBotClue, pickBotVote } from './botEngine';
 
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -15,9 +15,7 @@ export function generateRoomCode(): string {
 export const DEFAULT_SETTINGS: GameSettings = {
   clueTime: 45,
   voteTime: 40,
-  guessTime: 25,
   category: 'All',
-  allowImposterGuess: true,
   imposterCount: 1,
   maxRounds: 3,
 };
@@ -369,10 +367,8 @@ export class GameRoomManager {
         const imposterNames = imposterPlayers.map((p) => p.name).join(', ') || 'The Imposter';
 
         if (wasImposter) {
-          if (!room.settings.allowImposterGuess) {
-            room.winner = 'CIVILIANS';
-            room.winReason = `The Imposter (${eliminatedPlayer.name}) was discovered and voted out! Civilians win!`;
-          }
+          room.winner = 'CIVILIANS';
+          room.winReason = `The Imposter (${eliminatedPlayer.name}) was discovered and voted out! Civilians win!`;
         } else {
           // A Civilian was voted out by majority - game ends immediately!
           room.winner = 'IMPOSTER';
@@ -422,28 +418,12 @@ export class GameRoomManager {
     if (!room) return undefined;
 
     if (room.lastEliminated) {
-      // Someone was voted out by majority - game concludes!
+      // Someone was voted out by majority - game concludes immediately!
       if (room.lastEliminated.wasImposter) {
-        if (room.settings.allowImposterGuess && room.lastEliminated.player) {
-          room.phase = 'IMPOSTER_GUESS';
-          room.phaseDuration = room.settings.guessTime;
-          room.phaseEndTime = Date.now() + room.settings.guessTime * 1000;
-
-          // If eliminated player is a bot, trigger bot guess
-          if (room.lastEliminated.player.isBot && room.currentWord) {
-            setTimeout(() => {
-              const botGuess = pickBotImposterGuess(room.currentWord!);
-              this.handleImposterGuess(room.code, botGuess);
-            }, 3500);
-          }
-          return room;
-        } else {
-          // Civilians win directly!
-          room.winner = 'CIVILIANS';
-          room.winReason = `The Imposter (${room.lastEliminated.player.name}) was discovered and voted out! Civilians win!`;
-          room.phase = 'GAME_OVER';
-          return room;
-        }
+        room.winner = 'CIVILIANS';
+        room.winReason = `The Imposter (${room.lastEliminated.player.name}) was discovered and voted out! Civilians win!`;
+        room.phase = 'GAME_OVER';
+        return room;
       } else {
         // A Civilian was voted out by majority! Game ends immediately with Imposter winning!
         const imposterPlayers = room.players.filter((p) => p.role === 'IMPOSTER');
@@ -466,26 +446,6 @@ export class GameRoomManager {
     // Tie: continue to next round so players can break the tie!
     room.round += 1;
     this.proceedToClueInput(room.code);
-    return room;
-  }
-
-  public handleImposterGuess(code: string, guess: string): GameRoom | undefined {
-    const room = this.getRoom(code);
-    if (!room || room.phase !== 'IMPOSTER_GUESS' || !room.currentWord) return undefined;
-
-    const normalizedGuess = guess.trim().toLowerCase();
-    const correctWord = room.currentWord.word.toLowerCase();
-    const isCorrect = normalizedGuess === correctWord;
-
-    if (isCorrect) {
-      room.winner = 'IMPOSTER';
-      room.winReason = `The Imposter stole the win! Even though voted out, they correctly guessed the secret word "${room.currentWord.word}"!`;
-    } else {
-      room.winner = 'CIVILIANS';
-      room.winReason = `Civilians Win! The Imposter guessed "${guess}", but the secret word was "${room.currentWord.word}".`;
-    }
-
-    room.phase = 'GAME_OVER';
     return room;
   }
 
@@ -546,8 +506,7 @@ export class GameRoomManager {
     const myPlayer = room.players.find((p) => p.id === playerId) || null;
     const isGameOver = room.phase === 'GAME_OVER';
     const isVoteResultEliminated = room.phase === 'VOTE_RESULTS' && room.lastEliminated !== null;
-    const isImposterGuess = room.phase === 'IMPOSTER_GUESS';
-    const showRoles = isGameOver || isVoteResultEliminated || isImposterGuess;
+    const showRoles = isGameOver || isVoteResultEliminated;
 
     const sanitizedPlayers = room.players.map((p) => {
       const { role, ...rest } = p;
@@ -623,7 +582,6 @@ export class GameRoomManager {
       winReason: room.winReason,
       revealedWord: showRoles ? room.currentWord?.word : undefined,
       originalImposters,
-      imposterGuessOptions: room.phase === 'IMPOSTER_GUESS' ? room.currentWord?.options : undefined,
     };
   }
 }

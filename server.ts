@@ -212,20 +212,9 @@ app.prepare().then(() => {
         const room = gameManager.getRoom(code);
         if (room && room.phase === 'VOTE_RESULTS') {
           const outcomeRoom = gameManager.resolveVoteOutcome(code);
-          if (outcomeRoom?.phase === 'IMPOSTER_GUESS') {
-            scheduleGuessTimer(ioServer, code, outcomeRoom.settings.guessTime);
-          } else if (outcomeRoom?.phase === 'CLUE_INPUT') {
+          if (outcomeRoom?.phase === 'CLUE_INPUT') {
             scheduleClueTimer(ioServer, code, outcomeRoom.settings.clueTime);
           }
-        }
-      });
-    }
-
-    function scheduleGuessTimer(ioServer: SocketIOServer, code: string, seconds: number) {
-      scheduleRoomPhaseTimer(ioServer, code, seconds, () => {
-        const room = gameManager.getRoom(code);
-        if (room && room.phase === 'IMPOSTER_GUESS') {
-          gameManager.handleImposterGuess(code, '');
         }
       });
     }
@@ -273,24 +262,13 @@ app.prepare().then(() => {
       }
     });
 
-    // Imposter Guess submission
-    socket.on('submitImposterGuess', ({ roomCode, guess }: { roomCode: string; guess: string }) => {
-      clearRoomTimer(roomCode);
-      const room = gameManager.handleImposterGuess(roomCode, guess);
-      if (room) {
-        broadcastRoom(io, roomCode);
-      }
-    });
-
     // Host manually advances after results
     socket.on('proceedAfterResults', ({ roomCode }: { roomCode: string }) => {
       clearRoomTimer(roomCode);
       const outcomeRoom = gameManager.resolveVoteOutcome(roomCode);
       if (outcomeRoom) {
         broadcastRoom(io, roomCode);
-        if (outcomeRoom.phase === 'IMPOSTER_GUESS') {
-          scheduleGuessTimer(io, roomCode, outcomeRoom.settings.guessTime);
-        } else if (outcomeRoom.phase === 'CLUE_INPUT') {
+        if (outcomeRoom.phase === 'CLUE_INPUT') {
           scheduleClueTimer(io, roomCode, outcomeRoom.settings.clueTime);
         }
       }

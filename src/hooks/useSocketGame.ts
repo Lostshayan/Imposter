@@ -172,14 +172,6 @@ export function useSocketGame() {
     [gameState?.code, gameState?.myPlayer]
   );
 
-  const submitImposterGuess = useCallback(
-    (guess: string) => {
-      if (!socketRef.current || !gameState?.code) return;
-      socketRef.current.emit('submitImposterGuess', { roomCode: gameState.code, guess });
-    },
-    [gameState?.code]
-  );
-
   const proceedAfterResults = useCallback(() => {
     if (!socketRef.current || !gameState?.code) return;
     socketRef.current.emit('proceedAfterResults', { roomCode: gameState.code });
@@ -211,7 +203,6 @@ export function useSocketGame() {
     submitClue,
     proceedToVoting,
     castVote,
-    submitImposterGuess,
     proceedAfterResults,
     playAgain,
     leaveRoom,

@@ -57,7 +57,7 @@ export function VoteResultsScreen({ gameState, timeLeft, onProceed }: VoteResult
 
             <p className="text-xs text-slate-300 mt-1 max-w-xs font-medium">
               {eliminated.wasImposter
-                ? 'The civilians caught the imposter! Checking final word guess...'
+                ? 'The civilians caught the imposter! Civilians win immediately!'
                 : 'The game ends immediately! The imposter fooled the civilians and wins.'}
             </p>
 

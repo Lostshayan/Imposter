@@ -94,14 +94,3 @@ export function pickBotVote(
     return candidates[Math.floor(Math.random() * candidates.length)].id;
   }
 }
-
-export function pickBotImposterGuess(word: GameWord): string {
-  if (word.options && word.options.length > 0) {
-    // 50% chance the bot guesses right from multiple choice
-    if (Math.random() < 0.5) {
-      return word.word;
-    }
-    return word.options[Math.floor(Math.random() * word.options.length)];
-  }
-  return word.word;
-}

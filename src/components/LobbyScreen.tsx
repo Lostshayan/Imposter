@@ -309,20 +309,6 @@ export function LobbyScreen({
                   ))}
                 </div>
               </div>
-
-              {/* Allow Imposter Guess */}
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800">
-                <div>
-                  <div className="text-sm font-semibold text-slate-200">Imposter Clutch Guess</div>
-                  <div className="text-xs text-slate-400">If voted out, imposter can guess the word to win</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={gameState.settings.allowImposterGuess}
-                  onChange={(e) => onUpdateSettings({ allowImposterGuess: e.target.checked })}
-                  className="w-5 h-5 accent-indigo-600 rounded cursor-pointer"
-                />
-              </div>
             </div>
 
             <button

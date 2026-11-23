@@ -10,7 +10,6 @@ import { ClueInputScreen } from '../components/ClueInputScreen';
 import { ClueShowcaseScreen } from '../components/ClueShowcaseScreen';
 import { VotingScreen } from '../components/VotingScreen';
 import { VoteResultsScreen } from '../components/VoteResultsScreen';
-import { ImposterGuessScreen } from '../components/ImposterGuessScreen';
 import { GameOverScreen } from '../components/GameOverScreen';
 
 export default function ImposterGamePage() {
@@ -29,7 +28,6 @@ export default function ImposterGamePage() {
     submitClue,
     proceedToVoting,
     castVote,
-    submitImposterGuess,
     proceedAfterResults,
     playAgain,
     leaveRoom,
@@ -119,14 +117,6 @@ export default function ImposterGamePage() {
             gameState={gameState}
             timeLeft={timeLeft}
             onProceed={proceedAfterResults}
-          />
-        )}
-
-        {currentPhase === 'IMPOSTER_GUESS' && (
-          <ImposterGuessScreen
-            gameState={gameState}
-            timeLeft={timeLeft}
-            onSubmitGuess={submitImposterGuess}
           />
         )}
 

@@ -5,8 +5,6 @@ export type GamePhase =
   | 'CLUE_SHOWCASE'
   | 'VOTING'
   | 'VOTE_RESULTS'
-  | 'IMPOSTER_GUESS'
-  | 'ROUND_OVER'
   | 'GAME_OVER';
 
 export type PlayerRole = 'CIVILIAN' | 'IMPOSTER' | null;
@@ -40,9 +38,7 @@ export interface GameWord {
 export interface GameSettings {
   clueTime: number; // in seconds
   voteTime: number; // in seconds
-  guessTime: number; // in seconds
   category: string; // 'All' or specific
-  allowImposterGuess: boolean; // if caught, imposter can guess the word to steal victory
   imposterCount: number; // 1 (or 2 for large groups)
   maxRounds: number; // default 3
 }
@@ -113,7 +109,6 @@ export interface ClientGameState {
   winner: 'CIVILIANS' | 'IMPOSTER' | null;
   winReason?: string;
   revealedWord?: string; // only revealed at game over or when imposter revealed
-  imposterGuessOptions?: string[]; // for imposter guess phase
   originalImposters?: {
     id: string;
     name: string;

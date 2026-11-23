@@ -251,9 +251,9 @@ export function HomeScreen({ onCreateRoom, onJoinRoom, onSoloPlay, errorMsg }: H
                     4
                   </span>
                   <div>
-                    <h4 className="font-semibold text-slate-100">The Imposter's Final Chance</h4>
+                    <h4 className="font-semibold text-slate-100">Instant Victory & Elimination</h4>
                     <p className="text-slate-400 text-xs mt-0.5">
-                      If the imposter gets voted out, they get one final chance to guess the secret word. If they guess right, they steal the victory!
+                      If the majority votes out the Imposter, Civilians win immediately! But if an innocent Civilian is voted out, the Imposter wins on the spot.
                     </p>
                   </div>
                 </div>

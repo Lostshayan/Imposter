@@ -11,6 +11,7 @@ import { ClueShowcaseScreen } from '../components/ClueShowcaseScreen';
 import { VotingScreen } from '../components/VotingScreen';
 import { VoteResultsScreen } from '../components/VoteResultsScreen';
 import { GameOverScreen } from '../components/GameOverScreen';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
 export default function ImposterGamePage() {
   const {
@@ -51,12 +52,15 @@ export default function ImposterGamePage() {
   // If not inside a room, show Home / Join / Create / Solo
   if (!gameState) {
     return (
-      <HomeScreen
-        onCreateRoom={createRoom}
-        onJoinRoom={joinRoom}
-        onSoloPlay={handleSoloPlay}
-        errorMsg={errorMsg}
-      />
+      <>
+        <HomeScreen
+          onCreateRoom={createRoom}
+          onJoinRoom={joinRoom}
+          onSoloPlay={handleSoloPlay}
+          errorMsg={errorMsg}
+        />
+        <PWAInstallPrompt />
+      </>
     );
   }
 
@@ -138,6 +142,9 @@ export default function ImposterGamePage() {
           />
         )}
       </main>
+
+      {/* PWA Install Prompt for Mobile */}
+      <PWAInstallPrompt />
     </div>
   );
 }

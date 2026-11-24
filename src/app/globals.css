@@ -63,3 +63,165 @@ button, input, select, textarea, a {
 .animate-fade-in {
   animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ==========================================================================
+   WARM BEIGE LIGHT MODE AESTHETICS
+   Palette: Warm Oatmeal, Soft Parchment Linen, Taupe Borders & Espresso Ink
+   ========================================================================== */
+
+html.light {
+  --background: #f6f3eb;
+  --foreground: #211d1a;
+}
+
+html.light body {
+  background-color: #f6f3eb !important;
+  color: #211d1a !important;
+}
+
+/* Canvas background override */
+html.light .bg-\[\#0c1017\],
+html.light .bg-\[\#0c1017\]\/90 {
+  background-color: rgba(246, 243, 235, 0.94) !important;
+}
+
+/* Card surfaces -> Soft warm parchment cream */
+html.light .bg-slate-900,
+html.light .bg-slate-900\/95,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/40 {
+  background-color: #fcfbf8 !important;
+}
+
+/* Secondary nested containers / pill boxes -> Soft warm sand */
+html.light .bg-slate-950,
+html.light .bg-slate-950\/90,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950\/70,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/50,
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/30 {
+  background-color: #ede7dc !important;
+}
+
+/* Intermediate elements -> Warm natural linen */
+html.light .bg-slate-850 {
+  background-color: #f2ede2 !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/90,
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/70,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/40 {
+  background-color: #e8e2d4 !important;
+}
+
+/* Hover surfaces in light mode */
+html.light .hover\:bg-slate-850:hover,
+html.light .hover\:bg-slate-800:hover,
+html.light .hover\:bg-slate-750:hover,
+html.light .hover\:bg-slate-700:hover {
+  background-color: #dfd8c9 !important;
+}
+
+/* Borders -> Delicate warm taupe */
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/50,
+html.light .border-slate-700,
+html.light .border-slate-700\/80,
+html.light .border-slate-700\/70,
+html.light .border-slate-700\/60,
+html.light .border-slate-700\/50,
+html.light .border-slate-700\/40,
+html.light .divide-slate-800 > * + * {
+  border-color: #dfd7c7 !important;
+}
+
+/* Typography in light mode */
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #211d1a !important; /* deep espresso */
+}
+
+html.light .text-slate-300 {
+  color: #3e3833 !important; /* warm charcoal */
+}
+
+html.light .text-slate-400 {
+  color: #716962 !important; /* warm stone */
+}
+
+html.light .text-slate-500 {
+  color: #9c948b !important; /* soft taupe */
+}
+
+/* Text placeholder in light mode */
+html.light input::placeholder {
+  color: #9c948b !important;
+}
+
+/* Text on solid primary buttons remains crisp white */
+html.light button.bg-rose-600,
+html.light .bg-rose-600,
+html.light .bg-indigo-600,
+html.light .text-white {
+  color: #ffffff !important;
+}
+
+/* Amber highlights (Secret word, room code) in light mode */
+html.light .text-amber-300,
+html.light .text-amber-400 {
+  color: #b45309 !important; /* rich warm amber */
+}
+
+/* Secret word background in reveal screens */
+html.light .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(217, 119, 6, 0.3) !important;
+}
+
+/* Emerald civilian highlights in light mode */
+html.light .text-emerald-300,
+html.light .text-emerald-400 {
+  color: #047857 !important;
+}
+html.light .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Rose imposter highlights in light mode */
+html.light .text-rose-300,
+html.light .text-rose-400,
+html.light .text-red-300,
+html.light .text-red-400 {
+  color: #be123c !important;
+}
+html.light .bg-rose-500\/10,
+html.light .bg-rose-950\/20,
+html.light .bg-rose-950\/30 {
+  background-color: rgba(244, 63, 94, 0.08) !important;
+}
+
+/* Modal overlays in light mode */
+html.light .bg-black\/80 {
+  background-color: rgba(33, 29, 26, 0.6) !important;
+}
+
+/* Victory glows for light beige aesthetic */
+html.light .bg-emerald-950\/70 {
+  background-color: #e6f4ea !important;
+}
+html.light .bg-red-950\/70 {
+  background-color: #fce8e6 !important;
+}

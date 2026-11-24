@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Fingerprint, Users, Clock, LogOut, Copy, Check } from 'lucide-react';
+import { Fingerprint, Users, Clock, LogOut, Copy, Check, Sun, Moon } from 'lucide-react';
 import { ClientGameState } from '../types/game';
+import { useTheme } from '../context/ThemeContext';
 
 interface HeaderProps {
   gameState: ClientGameState | null;
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ gameState, timeLeft, onLeave, isConnected = true }: HeaderProps) {
   const [copied, setCopied] = React.useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const copyCode = () => {
     if (gameState?.code) {
@@ -82,14 +84,28 @@ export function Header({ gameState, timeLeft, onLeave, isConnected = true }: Hea
           </div>
         </div>
 
-        {/* Right: Leave Button */}
-        <button
-          onClick={onLeave}
-          title="Leave Room"
-          className="text-slate-400 hover:text-rose-400 active:scale-95 p-1.5 rounded-md hover:bg-slate-800 transition-all shrink-0 min-w-[28px] min-h-[28px] flex items-center justify-center"
-        >
-          <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        </button>
+        {/* Right: Theme Toggle & Leave Button */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={toggleTheme}
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Beige Light Mode'}
+            className="text-slate-400 hover:text-amber-500 active:scale-95 p-1.5 rounded-md hover:bg-slate-800 transition-all min-w-[28px] min-h-[28px] flex items-center justify-center"
+          >
+            {theme === 'light' ? (
+              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+            ) : (
+              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+            )}
+          </button>
+
+          <button
+            onClick={onLeave}
+            title="Leave Room"
+            className="text-slate-400 hover:text-rose-400 active:scale-95 p-1.5 rounded-md hover:bg-slate-800 transition-all shrink-0 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          >
+            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+        </div>
       </div>
     </header>
   );

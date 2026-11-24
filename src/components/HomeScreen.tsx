@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Fingerprint, Play, Plus, Users, Bot, HelpCircle, X, Shield, Eye, AlertCircle } from 'lucide-react';
+import { Fingerprint, Play, Plus, Users, Bot, HelpCircle, X, Shield, Eye, AlertCircle, Sun, Moon } from 'lucide-react';
 import { PlayerAvatar, AVATAR_GLYPHS, AvatarGlyphId } from './PlayerAvatar';
+import { useTheme } from '../context/ThemeContext';
 
 interface HomeScreenProps {
   onCreateRoom: (name: string, avatar: string, color: string) => void;
@@ -27,6 +28,7 @@ export function HomeScreen({ onCreateRoom, onJoinRoom, onSoloPlay, errorMsg }: H
   const [selectedColor, setSelectedColor] = useState(COLOR_THEMES[0].bg);
   const [showRules, setShowRules] = useState(false);
   const [mode, setMode] = useState<'MAIN' | 'JOIN'>('MAIN');
+  const { theme, toggleTheme } = useTheme();
 
   const playerName = name.trim() || 'Player';
 
@@ -46,6 +48,28 @@ export function HomeScreen({ onCreateRoom, onJoinRoom, onSoloPlay, errorMsg }: H
 
   return (
     <div className="min-h-screen min-h-[100dvh] bg-[#0c1017] text-slate-100 flex flex-col items-center justify-center p-3.5 sm:p-4 relative selection:bg-rose-500/30">
+      {/* Top Floating Theme Toggle */}
+      <div className="absolute top-3 right-3 sm:top-5 sm:right-5 z-20">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Beige Light Mode'}
+          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 transition-all flex items-center gap-1.5 shadow-sm text-xs font-semibold active:scale-95"
+        >
+          {theme === 'light' ? (
+            <>
+              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-700" />
+              <span className="hidden sm:inline">Dark</span>
+            </>
+          ) : (
+            <>
+              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+              <span className="hidden sm:inline">Beige Mode</span>
+            </>
+          )}
+        </button>
+      </div>
+
       <div className="w-full max-w-md mx-auto flex flex-col items-center py-4">
         {/* Sleek Brand Header */}
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">

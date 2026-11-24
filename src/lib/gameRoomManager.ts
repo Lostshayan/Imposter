@@ -57,6 +57,7 @@ export class GameRoomManager {
       round: 1,
       players: [hostPlayer],
       currentWord: null,
+      usedWordIds: [],
       imposterIds: [],
       turnOrder: [],
       currentTurnIndex: 0,
@@ -147,10 +148,11 @@ export class GameRoomManager {
     room.history = [];
     room.lastEliminated = null;
 
-    // Pick random word
-    const usedWordIds = room.history.map((h) => h.word);
-    const word = getRandomWord(room.settings.enabledCategories, usedWordIds);
+    // Pick random word avoiding words already played in this room
+    if (!room.usedWordIds) room.usedWordIds = [];
+    const word = getRandomWord(room.settings.enabledCategories, room.usedWordIds);
     room.currentWord = word;
+    room.usedWordIds.push(word.id);
 
     // Assign Imposter(s)
     const alivePlayers = [...room.players];

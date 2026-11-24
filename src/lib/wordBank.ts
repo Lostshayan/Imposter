@@ -502,7 +502,7 @@ export function getRandomWord(enabledCategories?: string[], usedIds: string[] = 
     }
   }
 
-  const unused = pool.filter((w) => !usedIds.includes(w.id));
+  const unused = pool.filter((w) => !usedIds.includes(w.id) && !usedIds.includes(w.word));
   const selectionPool = unused.length > 0 ? unused : pool;
   const randomIndex = Math.floor(Math.random() * selectionPool.length);
   return selectionPool[randomIndex];

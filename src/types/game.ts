@@ -70,6 +70,7 @@ export interface GameRoom {
   round: number;
   players: Player[];
   currentWord: GameWord | null;
+  usedWordIds?: string[];
   imposterIds: string[];
   turnOrder: string[]; // Order of player IDs for clue submission
   currentTurnIndex: number; // Current index in turnOrder

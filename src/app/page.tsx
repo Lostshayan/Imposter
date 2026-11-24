@@ -63,7 +63,15 @@ export default function ImposterGamePage() {
   const currentPhase = gameState.phase;
 
   return (
-    <div className="min-h-screen bg-[#0c1017] text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
+    <div
+      className={`min-h-screen bg-[#0c1017] text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white transition-all duration-700 ${
+        currentPhase === 'GAME_OVER'
+          ? gameState.winner === 'CIVILIANS'
+            ? 'shadow-[inset_0_0_140px_rgba(16,185,129,0.18)]'
+            : 'shadow-[inset_0_0_140px_rgba(239,68,68,0.18)]'
+          : ''
+      }`}
+    >
       {/* Top Header & Timer Bar */}
       <Header gameState={gameState} timeLeft={timeLeft} onLeave={leaveRoom} isConnected={isConnected} />
       <TimerBar timeLeft={timeLeft} totalTime={gameState.phaseDuration} />

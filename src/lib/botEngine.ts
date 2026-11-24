@@ -18,8 +18,11 @@ export const BOT_ROSTER: BotPersona[] = [
 
 export function createBotPlayer(existingBotsCount: number): Player {
   const persona = BOT_ROSTER[existingBotsCount % BOT_ROSTER.length];
-  const uniqueSuffix = existingBotsCount >= BOT_ROSTER.length ? ` ${Math.floor(existingBotsCount / BOT_ROSTER.length) + 1}` : '';
-  
+  const uniqueSuffix =
+    existingBotsCount >= BOT_ROSTER.length
+      ? ` ${Math.floor(existingBotsCount / BOT_ROSTER.length) + 1}`
+      : '';
+
   return {
     id: `bot_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     name: `${persona.name}${uniqueSuffix} (Bot)`,
@@ -37,49 +40,149 @@ export function createBotPlayer(existingBotsCount: number): Player {
   };
 }
 
-export function generateBotClue(bot: Player, currentWord: GameWord, existingClues: string[] = []): string {
+// Casual, relatable human party-game bluffs used by human imposters
+const GENERIC_HUMAN_BLUFFS = [
+  'Total classic',
+  'Honestly iconic',
+  'Can never go wrong with it',
+  'Super nostalgic',
+  'Always hits the spot',
+  'Crowd favorite',
+  'Huge fan personally',
+  'Such good vibes',
+  'Major throwback',
+  'Hard to beat',
+  'Everyone knows this one',
+  'Really popular choice',
+  'Unmatched energy',
+  'Always a solid pick',
+  'Pretty unforgettable',
+  'Instant crowd pleaser',
+  'One of the best',
+  'Absolute perfection',
+];
+
+// Contextual bluffs derived from common hint themes
+function getHintBasedBluffs(hint: string): string[] {
+  const lower = hint.toLowerCase();
+  const bluffs: string[] = [];
+
+  if (lower.includes('slice') || lower.includes('roast') || lower.includes('baker') || lower.includes('street') || lower.includes('scoop')) {
+    bluffs.push('Comfort food vibes', 'Late night craving', 'Always delivers', 'Best with friends', 'Warm and savory', 'Delicious staple');
+  }
+  if (lower.includes('voyage') || lower.includes('water') || lower.includes('ocean') || lower.includes('tank')) {
+    bluffs.push('Deep waters', 'Chilly atmosphere', 'Dramatic scale', 'Historic journey', 'High seas mystery', 'Cold horizon');
+  }
+  if (lower.includes('heist') || lower.includes('illusion') || lower.includes('code') || lower.includes('mind')) {
+    bluffs.push('Mind bending', 'High stakes', 'Complex layers', 'Keeps you guessing', 'Dark and clever', 'Twisted reality');
+  }
+  if (lower.includes('screen') || lower.includes('shield') || lower.includes('stamp') || lower.includes('lens')) {
+    bluffs.push('Everyday essential', 'Modern staple', 'Never leave home without it', 'Daily companion', 'Super practical');
+  }
+  if (lower.includes('court') || lower.includes('squares') || lower.includes('speed') || lower.includes('legend')) {
+    bluffs.push('High intensity', 'Fast reflexes', 'Competitive energy', 'Pure focus', 'Peak performance');
+  }
+  if (lower.includes('strings') || lower.includes('keys') || lower.includes('disc') || lower.includes('mixer')) {
+    bluffs.push('Timeless rhythm', 'Great sound', 'Iconic melody', 'Pure vibe', 'Vintage feel');
+  }
+  if (lower.includes('waddle') || lower.includes('jumper') || lower.includes('colors') || lower.includes('nap')) {
+    bluffs.push('Wild and free', 'Natural beauty', 'Rare sighting', 'Fascinating behavior', 'Pure wildlife');
+  }
+
+  return bluffs;
+}
+
+export function generateBotClue(
+  bot: Player,
+  currentWord: GameWord,
+  existingClues: string[] = []
+): string {
   const isImposter = bot.role === 'IMPOSTER';
   const normalizedExisting = new Set(existingClues.map((c) => c.trim().toLowerCase()));
-  
-  const candidatePool = isImposter
-    ? [
-        ...(currentWord.fakeImposterClues && currentWord.fakeImposterClues.length > 0
-          ? currentWord.fakeImposterClues
-          : []),
-        `Very notable in ${currentWord.category.toLowerCase()}`,
-        'Something almost everyone recognizes',
-        'Has a prominent and distinct purpose',
-        'Quite iconic and widely discussed',
-        'Known for its recognizable presence',
-        'Found and celebrated across cultures',
-      ]
-    : [
-        ...(currentWord.fakeCivClues && currentWord.fakeCivClues.length > 0
-          ? currentWord.fakeCivClues
-          : []),
-        `Signature element of ${currentWord.word}`,
-        'Instantly recognizable trait',
-        'Key defining detail',
-        'Unmistakable characteristic',
-      ];
 
-  // Filter out any clues that match already submitted clues
+  if (!isImposter) {
+    // ================= CIVILIAN BOT =================
+    // Pick from authentic, human party clues specific to this word
+    const authenticPool = currentWord.fakeCivClues && currentWord.fakeCivClues.length > 0
+      ? currentWord.fakeCivClues
+      : [`Classic ${currentWord.word}`, `Known for ${currentWord.word}`];
+
+    const available = authenticPool.filter((c) => !normalizedExisting.has(c.trim().toLowerCase()));
+    if (available.length > 0) {
+      return available[Math.floor(Math.random() * available.length)];
+    }
+
+    // Natural fallback variations if all pool clues used
+    const prefixes = ['Definitely', 'Signature', 'Always', 'Pure', 'Real'];
+    for (const prefix of prefixes) {
+      const candidate = `${prefix} ${authenticPool[0] || currentWord.word}`;
+      if (!normalizedExisting.has(candidate.toLowerCase())) {
+        return candidate;
+      }
+    }
+
+    return `${authenticPool[0]} vibes`;
+  }
+
+  // ================= IMPOSTER BOT =================
+  // A human imposter only has the vague 2-word hint (e.g. "Hot Slice" or "Cold Voyage")
+  // and wants to sound casual, safe, and believable.
+  const hintBluffs = getHintBasedBluffs(currentWord.hint);
+  const candidatePool = [
+    ...(currentWord.fakeImposterClues && currentWord.fakeImposterClues.length > 0
+      ? currentWord.fakeImposterClues
+      : []),
+    ...hintBluffs,
+    ...GENERIC_HUMAN_BLUFFS,
+  ];
+
+  // Try to find a clue that hasn't been submitted yet
   const available = candidatePool.filter((c) => !normalizedExisting.has(c.trim().toLowerCase()));
-
   if (available.length > 0) {
     return available[Math.floor(Math.random() * available.length)];
   }
 
-  // Guaranteed fallback with persona attribution to guarantee no duplicate
-  const base = candidatePool[0] || 'Very distinct';
-  return `${base} (observed)`;
+  // Fallback to casual human variants without robotic metadata
+  const prefixes = ['Super', 'Total', 'Really', 'Truly', 'Always'];
+  for (const p of prefixes) {
+    const candidate = `${p} iconic`;
+    if (!normalizedExisting.has(candidate.toLowerCase())) {
+      return candidate;
+    }
+  }
+
+  return 'A personal favorite';
 }
+
+// Keywords often found in generic bluffs
+const BLUFF_INDICATORS = [
+  'classic',
+  'iconic',
+  'popular',
+  'famous',
+  'nostalgic',
+  'vibes',
+  'favorite',
+  'everyone',
+  'anyone',
+  'solid',
+  'great',
+  'nice',
+  'unforgettable',
+  'legendary',
+  'throwback',
+  'staple',
+  'crowd',
+  'hits',
+  'spot',
+];
 
 export function pickBotVote(
   bot: Player,
   alivePlayers: Player[],
   clues: RoundClueRecord[],
-  imposterIds: string[]
+  imposterIds: string[],
+  currentWord?: GameWord | null
 ): string {
   // Candidate targets are alive players other than self
   const candidates = alivePlayers.filter((p) => p.id !== bot.id);
@@ -87,22 +190,137 @@ export function pickBotVote(
 
   const isBotImposter = bot.role === 'IMPOSTER';
 
+  // Build a lookup map of clues by player ID
+  const clueMap = new Map<string, string>();
+  clues.forEach((c) => {
+    if (c.clue) clueMap.set(c.playerId, c.clue.trim());
+  });
+
   if (isBotImposter) {
-    // As imposter, bot votes for a civilian who has an interesting or weird clue, avoiding fellow imposters
+    // ==========================================
+    // IMPOSTER BOT STRATEGY:
+    // Does not know the word. Wants to blend in and frame a civilian.
+    // Finds the civilian whose clue is most divisive, vague, or short.
+    // ==========================================
     const civilianCandidates = candidates.filter((p) => !imposterIds.includes(p.id));
-    if (civilianCandidates.length > 0) {
-      return civilianCandidates[Math.floor(Math.random() * civilianCandidates.length)].id;
-    }
-    return candidates[Math.floor(Math.random() * candidates.length)].id;
-  } else {
-    // As civilian, bot has a 75% chance of picking an actual imposter if suspicious, or random candidate
-    const actualImposters = candidates.filter((p) => imposterIds.includes(p.id));
-    const shouldVoteImposter = Math.random() < 0.70 && actualImposters.length > 0;
+    const targetPool = civilianCandidates.length > 0 ? civilianCandidates : candidates;
 
-    if (shouldVoteImposter) {
-      return actualImposters[Math.floor(Math.random() * actualImposters.length)].id;
-    }
+    // Rank civilian targets by who is easiest to frame:
+    // 1) Clue is very short or vague
+    // 2) Clue was a generic phrase
+    // 3) Already has suspicion
+    let bestTarget = targetPool[0];
+    let maxVulnerability = -1;
 
-    return candidates[Math.floor(Math.random() * candidates.length)].id;
+    targetPool.forEach((cand) => {
+      const candClue = (clueMap.get(cand.id) || '').toLowerCase();
+      let vulnerability = 10;
+
+      // Shorter clues are easier to frame as "suspiciously low effort"
+      if (candClue.split(/\s+/).length <= 2) vulnerability += 20;
+
+      // If clue contains words commonly questioned in word games
+      if (BLUFF_INDICATORS.some((b) => candClue.includes(b))) {
+        vulnerability += 25;
+      }
+
+      // Slightly prefer humans over other bots to test player bluffing
+      if (!cand.isBot) vulnerability += 10;
+
+      if (vulnerability > maxVulnerability) {
+        maxVulnerability = vulnerability;
+        bestTarget = cand;
+      }
+    });
+
+    return bestTarget.id;
   }
+
+  // ==========================================
+  // CIVILIAN BOT STRATEGY:
+  // Genuine Social Deduction!
+  // Evaluates every candidate's clue against the secret word and authentic traits.
+  // Calculates a Suspicion Score (0 to 100+). Highest suspicion gets voted!
+  // ==========================================
+  const wordTokens = currentWord
+    ? [
+        currentWord.word.toLowerCase(),
+        ...(currentWord.fakeCivClues || []).flatMap((c) => c.toLowerCase().split(/\s+/)),
+      ].filter((t) => t.length > 2)
+    : [];
+
+  const suspicionScores = new Map<string, number>();
+
+  candidates.forEach((cand) => {
+    const rawClue = clueMap.get(cand.id) || '';
+    const candClue = rawClue.toLowerCase().trim();
+    let suspicion = 30; // Baseline neutral suspicion
+
+    if (!candClue || candClue.includes('no clue') || candClue.includes('skipped')) {
+      // Failed to submit a clue on time: extremely suspicious!
+      suspicion += 60;
+      suspicionScores.set(cand.id, suspicion);
+      return;
+    }
+
+    const candWords = candClue.split(/\s+/);
+
+    // 1. Direct Knowledge Check (Did this clue mention real word specifics?)
+    let authenticMatches = 0;
+    wordTokens.forEach((token) => {
+      if (candClue.includes(token)) {
+        authenticMatches++;
+      }
+    });
+
+    if (authenticMatches >= 2) {
+      // Highly specific authentic clue: definitely civilian!
+      suspicion -= 45;
+    } else if (authenticMatches === 1) {
+      // Mentioned an authentic element
+      suspicion -= 25;
+    }
+
+    // 2. Generic Bluff Detection
+    // If the clue is made of generic party bluffs and lacks any authentic tokens:
+    const bluffMatches = BLUFF_INDICATORS.filter((b) => candClue.includes(b)).length;
+    if (bluffMatches > 0 && authenticMatches === 0) {
+      suspicion += 35 + bluffMatches * 10; // Smells like an imposter bluffing!
+    }
+
+    // 3. Ultra-short non-committal answer (e.g. 1-2 words without specific noun)
+    if (candWords.length <= 1 && authenticMatches === 0) {
+      suspicion += 25;
+    }
+
+    // 4. Persona-Specific Instincts:
+    // Alex & Max (analytical): Penalize non-factual adjectives heavily
+    if (bot.name.includes('Alex') || bot.name.includes('Max')) {
+      if (authenticMatches === 0) suspicion += 15;
+    }
+    // Leo (bold): Charges hard at highest bluffers
+    if (bot.name.includes('Leo')) {
+      if (bluffMatches > 0) suspicion += 20;
+    }
+    // Sam (sneaky): Suspicious of generic consensus
+    if (bot.name.includes('Sam')) {
+      if (candClue.includes('everyone') || candClue.includes('popular')) suspicion += 20;
+    }
+
+    suspicionScores.set(cand.id, suspicion);
+  });
+
+  // Pick candidate with the highest suspicion score
+  let mostSuspiciousId = candidates[0].id;
+  let highestScore = -999;
+
+  candidates.forEach((cand) => {
+    const score = suspicionScores.get(cand.id) ?? 0;
+    if (score > highestScore) {
+      highestScore = score;
+      mostSuspiciousId = cand.id;
+    }
+  });
+
+  return mostSuspiciousId;
 }

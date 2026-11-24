@@ -381,7 +381,13 @@ export class GameRoomManager {
       setTimeout(() => {
         const liveRoom = this.getRoom(room.code);
         if (liveRoom && liveRoom.phase === 'VOTING') {
-          const targetId = pickBotVote(bot, liveRoom.players.filter((p) => p.isAlive), clues, liveRoom.imposterIds);
+          const targetId = pickBotVote(
+            bot,
+            liveRoom.players.filter((p) => p.isAlive),
+            clues,
+            liveRoom.imposterIds,
+            liveRoom.currentWord
+          );
           this.castVote(liveRoom.code, bot.id, targetId);
         }
       }, delayMs);

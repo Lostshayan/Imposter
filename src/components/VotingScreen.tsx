@@ -47,7 +47,7 @@ export function VotingScreen({ gameState, timeLeft, onCastVote }: VotingScreenPr
             <div
               key={player.id}
               onClick={() => !hasVoted && setSelectedTargetId(player.id)}
-              className={`w-full rounded-xl p-3.5 border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+              className={`w-full rounded-xl p-3 sm:p-3.5 border transition-all cursor-pointer flex items-center justify-between gap-3 min-h-[56px] active:scale-[0.99] ${
                 isSelected
                   ? 'bg-rose-950/30 border-rose-500 ring-1 ring-rose-500/50'
                   : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 hover:bg-slate-850'
@@ -110,7 +110,7 @@ export function VotingScreen({ gameState, timeLeft, onCastVote }: VotingScreenPr
           <button
             onClick={handleVoteSubmit}
             disabled={!selectedTargetId}
-            className="w-full py-3.5 px-6 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-base rounded-xl border border-rose-500 shadow-md shadow-rose-900/30 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3.5 px-6 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold text-sm sm:text-base rounded-xl border border-rose-500 shadow-md shadow-rose-900/30 flex items-center justify-center gap-2 transition-all"
           >
             <Vote className="w-4 h-4" />
             <span>Lock In Vote</span>

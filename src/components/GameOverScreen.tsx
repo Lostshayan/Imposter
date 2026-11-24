@@ -120,17 +120,17 @@ export function GameOverScreen({ gameState, onPlayAgain, onLeave }: GameOverScre
 
         {/* 2. Unified Reveal Card (Secret Word & Imposter) */}
         <div
-          className={`w-full bg-slate-900/80 rounded-2xl p-5 shadow-lg mb-5 text-left border ${
+          className={`w-full bg-slate-900/80 rounded-2xl p-4 sm:p-5 shadow-lg mb-4 sm:mb-5 text-left border ${
             civWon ? 'border-emerald-500/30' : 'border-red-500/30'
           }`}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
             {/* Secret Word */}
             <div className="flex flex-col justify-center pr-0 sm:pr-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
                 Secret Word
               </span>
-              <div className="text-2xl font-black text-amber-300 tracking-wide">
+              <div className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide">
                 {gameState.revealedWord || gameState.mySecretWord || 'Secret'}
               </div>
               {gameState.currentCategory && (

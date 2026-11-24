@@ -196,8 +196,8 @@ export function LobbyScreen({
           )}
         </div>
 
-        {/* Players Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
+        {/* Players Grid - 1 column on mobile, 2 columns on tablet/desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {gameState.players.map((player) => (
             <div
               key={player.id}
@@ -304,7 +304,7 @@ export function LobbyScreen({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {CATEGORIES_LIST.map((cat) => {
                 const isEnabled = enabledCategories.includes(cat.name);
                 return (

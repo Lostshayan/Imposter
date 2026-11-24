@@ -36,26 +36,26 @@ export function Leaderboard({
     switch (rank) {
       case 1:
         return (
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/40 text-amber-300 font-extrabold text-xs flex items-center justify-center gap-0.5 shadow-sm">
-            <Crown className="w-3 h-3 text-amber-400" />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/10 border border-amber-500/40 text-amber-300 font-extrabold text-[11px] sm:text-xs flex items-center justify-center gap-0.5 shadow-sm shrink-0">
+            <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
             <span>1</span>
           </div>
         );
       case 2:
         return (
-          <div className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-600/50 text-slate-200 font-extrabold text-xs flex items-center justify-center">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800/80 border border-slate-600/50 text-slate-200 font-extrabold text-[11px] sm:text-xs flex items-center justify-center shrink-0">
             <span>2</span>
           </div>
         );
       case 3:
         return (
-          <div className="w-8 h-8 rounded-lg bg-orange-950/30 border border-orange-600/40 text-orange-300 font-extrabold text-xs flex items-center justify-center">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-orange-950/30 border border-orange-600/40 text-orange-300 font-extrabold text-[11px] sm:text-xs flex items-center justify-center shrink-0">
             <span>3</span>
           </div>
         );
       default:
         return (
-          <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 font-bold text-xs flex items-center justify-center">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 font-bold text-[11px] sm:text-xs flex items-center justify-center shrink-0">
             <span>{rank}</span>
           </div>
         );
@@ -63,9 +63,9 @@ export function Leaderboard({
   };
 
   return (
-    <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-sm text-left backdrop-blur-md">
+    <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-sm text-left backdrop-blur-md">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+      <div className="flex items-center justify-between mb-3 pb-2.5 sm:mb-4 sm:pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
             <Trophy className="w-4 h-4" />
@@ -129,7 +129,7 @@ export function Leaderboard({
           return (
             <div
               key={player.id}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 sm:gap-3 ${
                 isMe
                   ? 'bg-slate-850 border-rose-500/40 ring-1 ring-rose-500/20'
                   : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700/80'

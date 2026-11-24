@@ -32,7 +32,7 @@ export function RoleRevealScreen({ gameState, timeLeft, onProceed }: RoleRevealS
         className="w-full cursor-pointer select-none my-3"
       >
         <div
-          className={`w-full min-h-[300px] rounded-2xl p-6 transition-all duration-300 shadow-sm flex flex-col items-center justify-center relative ${
+          className={`w-full min-h-[260px] sm:min-h-[300px] rounded-2xl p-5 sm:p-6 transition-all duration-300 shadow-sm flex flex-col items-center justify-center relative ${
             !isRevealed
               ? 'bg-slate-900/60 border border-dashed border-slate-700 hover:border-slate-600'
               : isImposter

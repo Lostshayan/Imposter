@@ -64,7 +64,7 @@ export default function ImposterGamePage() {
 
   return (
     <div
-      className={`min-h-screen bg-[#0c1017] text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white transition-all duration-700 ${
+      className={`min-h-screen min-h-[100dvh] bg-[#0c1017] text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white transition-all duration-700 ${
         currentPhase === 'GAME_OVER'
           ? gameState.winner === 'CIVILIANS'
             ? 'shadow-[inset_0_0_140px_rgba(16,185,129,0.18)]'
@@ -77,7 +77,7 @@ export default function ImposterGamePage() {
       <TimerBar timeLeft={timeLeft} totalTime={gameState.phaseDuration} />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+      <main className="flex-1 max-w-4xl w-full mx-auto p-3.5 sm:p-6 pb-8 sm:pb-8 flex flex-col justify-center">
         {currentPhase === 'LOBBY' && (
           <LobbyScreen
             gameState={gameState}

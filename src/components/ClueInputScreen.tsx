@@ -94,7 +94,7 @@ export function ClueInputScreen({ gameState, timeLeft, onSubmitClue }: ClueInput
       </div>
 
       {/* Turn Order Tracker Sequence */}
-      <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-3 shadow-sm mb-4 overflow-x-auto">
+      <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-3 shadow-sm mb-3.5 sm:mb-4 overflow-x-auto no-scrollbar">
         <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
           <span className="font-bold uppercase tracking-wider text-[10px]">Clue Submission Sequence</span>
           <span className="font-mono text-slate-400">
@@ -205,7 +205,7 @@ export function ClueInputScreen({ gameState, timeLeft, onSubmitClue }: ClueInput
             <button
               type="submit"
               disabled={!clueText.trim() || !!duplicate}
-              className="w-full py-3 px-5 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-3.5 px-5 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Submit Clue</span>

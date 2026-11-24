@@ -78,7 +78,7 @@ export function ClueShowcaseScreen({
         {isHost ? (
           <button
             onClick={onProceedToVoting}
-            className="w-full py-3 px-5 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3.5 px-5 bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white font-bold text-sm rounded-xl border border-rose-500 shadow-md shadow-rose-900/20 flex items-center justify-center gap-2 transition-all"
           >
             <span>Proceed to Voting ({timeLeft}s)</span>
             <ArrowRight className="w-4 h-4" />

@@ -38,7 +38,7 @@ export class GameRoomManager {
     const hostPlayer: Player = {
       id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       name: hostName || 'Player 1',
-      avatar: avatar || '🕵️',
+      avatar: avatar || 'target',
       color: color || 'from-blue-500 to-indigo-600',
       isHost: true,
       isBot: false,
@@ -90,7 +90,7 @@ export class GameRoomManager {
     const player: Player = {
       id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       name: playerName || `Player ${room.players.length + 1}`,
-      avatar: avatar || '🕵️',
+      avatar: avatar || 'target',
       color: color || 'from-violet-500 to-purple-600',
       isHost: false,
       isBot: false,
@@ -716,6 +716,7 @@ export class GameRoomManager {
             id: room.lastEliminated.player.id,
             name: room.lastEliminated.player.name,
             avatar: room.lastEliminated.player.avatar,
+            color: room.lastEliminated.player.color,
             wasImposter: room.lastEliminated.wasImposter,
           }
         : null,

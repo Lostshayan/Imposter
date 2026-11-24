@@ -111,6 +111,7 @@ export interface ClientGameState {
     id: string;
     name: string;
     avatar: string;
+    color?: string;
     wasImposter: boolean;
   } | null;
   winner: 'CIVILIANS' | 'IMPOSTER' | null;

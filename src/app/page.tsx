@@ -63,7 +63,7 @@ export default function ImposterGamePage() {
   const currentPhase = gameState.phase;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-[#0c1017] text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
       {/* Top Header & Timer Bar */}
       <Header gameState={gameState} timeLeft={timeLeft} onLeave={leaveRoom} isConnected={isConnected} />
       <TimerBar timeLeft={timeLeft} totalTime={gameState.phaseDuration} />

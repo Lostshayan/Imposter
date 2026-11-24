@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare, ArrowRight, Sparkles, Volume2 } from 'lucide-react';
+import { MessageSquare, ArrowRight } from 'lucide-react';
 import { ClientGameState } from '../types/game';
+import { PlayerAvatar } from './PlayerAvatar';
 
 interface ClueShowcaseScreenProps {
   gameState: ClientGameState;
@@ -21,48 +22,49 @@ export function ClueShowcaseScreen({
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
       {/* Title */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
-          <MessageSquare className="w-3.5 h-3.5" />
+      <div className="text-center mb-5">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-slate-800 text-slate-300 border border-slate-700 mb-1.5">
+          <MessageSquare className="w-3 h-3 text-slate-400" />
           <span>Discussion Phase • Round {gameState.round}</span>
         </div>
-        <h2 className="text-3xl font-black text-slate-100">Review Everyone's Clues</h2>
-        <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-          Read all the clues below! Who seems too vague? Who sounds like they didn't know the exact word?
+        <h2 className="text-2xl font-bold text-slate-100">Review All Clues</h2>
+        <p className="text-xs text-slate-400 mt-0.5 max-w-md mx-auto">
+          Read each clue carefully. Who sounds too vague? Who seems to only know a broad category hint?
         </p>
       </div>
 
       {/* Clues Showcase Grid */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {clues.map((item, index) => {
           const isMe = item.playerId === gameState.myPlayer?.id;
           return (
             <div
               key={item.playerId || index}
-              className={`rounded-2xl p-5 border transition-all shadow-lg flex flex-col justify-between ${
+              className={`rounded-xl p-4 border transition-all flex flex-col justify-between ${
                 isMe
-                  ? 'bg-gradient-to-br from-indigo-950/60 to-slate-900 border-indigo-500/50 ring-1 ring-indigo-500/30'
-                  : 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                  ? 'bg-slate-850 border-rose-500/40 ring-1 ring-rose-500/20'
+                  : 'bg-slate-900/70 border-slate-800'
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${item.color} flex items-center justify-center text-lg shadow-md`}
-                  >
-                    {item.avatar}
-                  </div>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2">
+                  <PlayerAvatar
+                    avatar={item.avatar}
+                    color={item.color}
+                    name={item.playerName}
+                    size="sm"
+                  />
                   <div>
-                    <span className="font-bold text-sm text-slate-200">{item.playerName}</span>
-                    {isMe && <span className="ml-1.5 text-[10px] font-bold text-indigo-400">(You)</span>}
+                    <span className="font-semibold text-xs text-slate-200">{item.playerName}</span>
+                    {isMe && <span className="ml-1.5 text-[9px] font-bold text-rose-400">(You)</span>}
                   </div>
                 </div>
                 <span className="text-[10px] text-slate-500 font-mono">#{index + 1}</span>
               </div>
 
               {/* The Clue */}
-              <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 my-1">
-                <p className="text-base font-semibold text-slate-100 italic">
+              <div className="bg-slate-950/80 border border-slate-800 rounded-lg p-3">
+                <p className="text-sm font-semibold text-slate-100 italic">
                   "{item.clue}"
                 </p>
               </div>
@@ -76,15 +78,14 @@ export function ClueShowcaseScreen({
         {isHost ? (
           <button
             onClick={onProceedToVoting}
-            className="w-full py-4 px-6 bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full py-3 px-5 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors"
           >
             <span>Proceed to Voting ({timeLeft}s)</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         ) : (
-          <div className="w-full py-3.5 px-6 bg-slate-900/80 border border-slate-800 rounded-2xl text-center text-slate-400 text-sm font-semibold flex items-center justify-center gap-2">
-            <span>Voting starts in</span>
-            <span className="font-mono font-bold text-indigo-400 text-base">{timeLeft}s</span>
+          <div className="text-xs text-slate-400 text-center font-medium">
+            Voting phase begins in {timeLeft}s...
           </div>
         )}
       </div>

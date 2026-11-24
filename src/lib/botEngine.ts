@@ -8,12 +8,12 @@ export interface BotPersona {
 }
 
 export const BOT_ROSTER: BotPersona[] = [
-  { name: 'Alex', avatar: '🦊', color: 'from-amber-500 to-orange-600', personality: 'analytical' },
-  { name: 'Maya', avatar: '🐱', color: 'from-pink-500 to-rose-600', personality: 'casual' },
-  { name: 'Leo', avatar: '🦁', color: 'from-yellow-500 to-amber-600', personality: 'bold' },
-  { name: 'Sam', avatar: '🐼', color: 'from-emerald-500 to-teal-600', personality: 'sneaky' },
-  { name: 'Zoe', avatar: '🦄', color: 'from-purple-500 to-indigo-600', personality: 'poetic' },
-  { name: 'Max', avatar: '🤖', color: 'from-cyan-500 to-blue-600', personality: 'analytical' },
+  { name: 'Alex', avatar: 'target', color: 'from-amber-600/80 to-amber-700/80', personality: 'analytical' },
+  { name: 'Maya', avatar: 'sparkles', color: 'from-rose-600/80 to-pink-700/80', personality: 'casual' },
+  { name: 'Leo', avatar: 'flame', color: 'from-orange-600/80 to-red-700/80', personality: 'bold' },
+  { name: 'Sam', avatar: 'ghost', color: 'from-emerald-600/80 to-teal-700/80', personality: 'sneaky' },
+  { name: 'Zoe', avatar: 'gem', color: 'from-indigo-600/80 to-violet-700/80', personality: 'poetic' },
+  { name: 'Max', avatar: 'zap', color: 'from-blue-600/80 to-cyan-700/80', personality: 'analytical' },
 ];
 
 export function createBotPlayer(existingBotsCount: number): Player {

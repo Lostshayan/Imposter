@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight, Users, ShieldAlert, Sparkles, Skull } from 'lucide-react';
+import { ArrowRight, Users, CheckCircle2, AlertCircle, EyeOff, Scale } from 'lucide-react';
 import { ClientGameState } from '../types/game';
 import { Leaderboard } from './Leaderboard';
+import { PlayerAvatar } from './PlayerAvatar';
 
 interface VoteResultsScreenProps {
   gameState: ClientGameState;
@@ -20,70 +21,79 @@ export function VoteResultsScreen({ gameState, timeLeft, onProceed }: VoteResult
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col items-center text-center">
       <div className="mb-4">
-        <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-slate-800 text-slate-300 border border-slate-700">
+        <span className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-slate-800 text-slate-300 border border-slate-700">
           The Verdict • Round {gameState.round}
         </span>
-        <h2 className="text-3xl font-black text-slate-100 mt-2">Voting Results</h2>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 mt-2">Voting Results</h2>
       </div>
 
       {/* Outcome Card */}
       <div className="w-full mb-6">
         {eliminated ? (
           <div
-            className={`rounded-3xl p-6 border shadow-2xl flex flex-col items-center transition-all ${
+            className={`rounded-2xl p-6 border shadow-xl flex flex-col items-center transition-all ${
               eliminated.wasImposter
-                ? 'bg-gradient-to-b from-rose-950/80 to-slate-900 border-rose-500 shadow-rose-500/20'
-                : 'bg-gradient-to-b from-amber-950/80 to-slate-900 border-amber-500 shadow-amber-500/20'
+                ? 'bg-rose-950/20 border-rose-500/40 shadow-rose-950/20'
+                : 'bg-amber-950/20 border-amber-500/40 shadow-amber-950/20'
             }`}
           >
-            <div className="w-20 h-20 rounded-2xl bg-slate-900/90 border border-slate-700 flex items-center justify-center text-4xl mb-3 shadow-xl">
-              {eliminated.avatar}
+            <div className="mb-3">
+              <PlayerAvatar
+                avatar={eliminated.avatar}
+                color={eliminated.color}
+                name={eliminated.name}
+                size="lg"
+              />
             </div>
 
-            <div className="text-xl font-black text-slate-100 mb-1">
-              {eliminated.name} was voted out by majority!
+            <div className="text-lg font-bold text-slate-100 mb-1">
+              {eliminated.name} was voted out by majority
             </div>
 
             <div className="my-2">
               {eliminated.wasImposter ? (
-                <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-500/30 text-rose-300 border border-rose-500/50 text-sm font-extrabold tracking-wide uppercase">
-                  <span>🎯 THEY WERE THE IMPOSTER!</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs font-bold tracking-wide uppercase">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>They Were The Imposter</span>
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-sm font-extrabold tracking-wide uppercase">
-                  <span>😱 THEY WERE AN INNOCENT CIVILIAN!</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/30 text-xs font-bold tracking-wide uppercase">
+                  <AlertCircle className="w-4 h-4 text-rose-400" />
+                  <span>They Were An Innocent Civilian</span>
                 </div>
               )}
             </div>
 
             <p className="text-xs text-slate-300 mt-1 max-w-xs font-medium">
               {eliminated.wasImposter
-                ? 'The civilians caught the imposter! Civilians win immediately!'
-                : 'The game ends immediately! The imposter fooled the civilians and wins.'}
+                ? 'The civilians caught the imposter! Civilians win this game.'
+                : 'The game ends immediately! The imposter evaded capture and wins.'}
             </p>
 
             {/* REVEAL OF THE ORIGINAL IMPOSTER */}
             {!eliminated.wasImposter && originalImposters.length > 0 && (
-              <div className="w-full bg-slate-950/90 border border-rose-500/40 rounded-2xl p-4 mt-4 text-left">
-                <div className="text-[11px] font-black uppercase tracking-wider text-rose-400 mb-2.5 flex items-center gap-1.5">
-                  <span>😈 THE ORIGINAL IMPOSTER WAS:</span>
+              <div className="w-full bg-slate-900/90 border border-rose-500/30 rounded-xl p-3.5 mt-4 text-left">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-rose-400 mb-2 flex items-center gap-1.5">
+                  <EyeOff className="w-3.5 h-3.5" />
+                  <span>The Real Imposter Was</span>
                 </div>
                 {originalImposters.map((imp) => (
                   <div key={imp.id} className="flex items-center gap-3">
-                    <div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-tr ${imp.color} flex items-center justify-center text-2xl shrink-0 shadow-lg`}
-                    >
-                      {imp.avatar}
-                    </div>
+                    <PlayerAvatar
+                      avatar={imp.avatar}
+                      color={imp.color}
+                      name={imp.name}
+                      size="md"
+                    />
                     <div className="min-w-0">
-                      <div className="font-black text-slate-100 text-base flex items-center gap-2">
+                      <div className="font-bold text-slate-100 text-sm flex items-center gap-2">
                         <span>{imp.name}</span>
-                        <span className="text-[10px] font-black uppercase text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-bold uppercase text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded">
                           Imposter
                         </span>
                       </div>
                       <div className="text-xs text-rose-300/90 mt-0.5">
-                        Secret hint they had: <span className="italic font-semibold text-amber-200">"{imp.hint || gameState.myHint}"</span>
+                        Secret hint they held: <span className="italic font-semibold text-amber-200">"{imp.hint || gameState.myHint}"</span>
                       </div>
                     </div>
                   </div>
@@ -93,50 +103,55 @@ export function VoteResultsScreen({ gameState, timeLeft, onProceed }: VoteResult
 
             {/* Secret Word Reveal if Civilian Eliminated */}
             {!eliminated.wasImposter && gameState.revealedWord && (
-              <div className="w-full bg-cyan-950/30 border border-cyan-500/30 rounded-2xl p-3 mt-3 text-center">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 block mb-0.5">
-                  The Secret Common Word Was:
+              <div className="w-full bg-slate-900/90 border border-slate-800 rounded-xl p-3 mt-3 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                  The Secret Word Was
                 </span>
-                <span className="text-2xl font-black tracking-wide text-cyan-200">
+                <span className="text-xl font-extrabold tracking-wide text-amber-300">
                   {gameState.revealedWord}
                 </span>
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mb-3">
-              <Users className="w-8 h-8" />
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 flex items-center justify-center mb-3">
+              <Scale className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-100 mb-1">Tie Vote / No Majority</h3>
+            <h3 className="text-lg font-bold text-slate-100 mb-1">Tie Vote / No Majority</h3>
             <p className="text-xs text-slate-400 max-w-xs">
-              Votes were tied or skipped! Nobody reached majority so another round will decide.
+              Votes were tied or skipped. No player reached majority so another round will decide.
             </p>
           </div>
         )}
       </div>
 
       {/* Vote Breakdown */}
-      <div className="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left">
+      <div className="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-4 mb-6 text-left">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 text-center">
           Vote Tally Breakdown
         </h4>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {players.map((player) => (
             <div
               key={player.id}
-              className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50"
+              className="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-800/40 border border-slate-700/40"
             >
-              <div className="flex items-center gap-2">
-                <span>{player.avatar}</span>
-                <span className="font-semibold text-slate-200">{player.name}</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <PlayerAvatar
+                  avatar={player.avatar}
+                  color={player.color}
+                  name={player.name}
+                  size="sm"
+                />
+                <span className="font-semibold text-slate-200 truncate">{player.name}</span>
                 {player.role === 'IMPOSTER' && eliminated && (
                   <span className="text-[9px] font-bold uppercase text-rose-400 bg-rose-500/20 px-1 py-0.5 rounded">
                     Imposter
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <span className="font-mono font-bold text-amber-400">
                   {player.votesReceived} {player.votesReceived === 1 ? 'vote' : 'votes'}
                 </span>
@@ -162,14 +177,14 @@ export function VoteResultsScreen({ gameState, timeLeft, onProceed }: VoteResult
         {isHost ? (
           <button
             onClick={onProceed}
-            className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white font-black rounded-2xl shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full py-3.5 px-6 bg-rose-600 hover:bg-rose-500 text-white font-bold text-base rounded-xl border border-rose-500 shadow-md shadow-rose-900/30 flex items-center justify-center gap-2 transition-all"
           >
             <span>
               {eliminated && !eliminated.wasImposter
-                ? `Game Over • View Final Screen (${timeLeft}s)`
-                : `Proceed (${timeLeft}s)`}
+                ? `View Final Summary (${timeLeft}s)`
+                : `Proceed to Next Round (${timeLeft}s)`}
             </span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         ) : (
           <div className="text-xs text-slate-400 font-medium">

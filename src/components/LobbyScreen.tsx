@@ -10,20 +10,27 @@ import {
   Play,
   Settings,
   X,
-  ShieldAlert,
-  Sparkles,
+  AlertCircle,
   Plus,
   Zap,
   Tag,
-  CheckSquare,
-  Square,
-  SlidersHorizontal,
   Trophy,
   RotateCcw,
+  Clapperboard,
+  BookOpen,
+  Award,
+  Utensils,
+  Compass,
+  Globe,
+  Gamepad2,
+  Music,
+  Smartphone,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { ClientGameState, GameSettings } from '../types/game';
 import { CATEGORIES_LIST, ALL_CATEGORY_NAMES } from '../lib/wordBank';
 import { Leaderboard } from './Leaderboard';
+import { PlayerAvatar } from './PlayerAvatar';
 
 interface LobbyScreenProps {
   gameState: ClientGameState;
@@ -33,6 +40,34 @@ interface LobbyScreenProps {
   onStartGame: () => void;
   onResetScores?: () => void;
   errorMsg: string | null;
+}
+
+function CategoryIcon({ iconKey }: { iconKey: string }) {
+  const iconProps = { className: 'w-4 h-4' };
+  switch (iconKey) {
+    case 'film':
+      return <Clapperboard {...iconProps} className="w-4 h-4 text-amber-400" />;
+    case 'book':
+      return <BookOpen {...iconProps} className="w-4 h-4 text-indigo-400" />;
+    case 'sparkles':
+      return <Award {...iconProps} className="w-4 h-4 text-yellow-400" />;
+    case 'utensils':
+      return <Utensils {...iconProps} className="w-4 h-4 text-orange-400" />;
+    case 'compass':
+      return <Compass {...iconProps} className="w-4 h-4 text-emerald-400" />;
+    case 'globe':
+      return <Globe {...iconProps} className="w-4 h-4 text-cyan-400" />;
+    case 'gamepad':
+      return <Gamepad2 {...iconProps} className="w-4 h-4 text-purple-400" />;
+    case 'music':
+      return <Music {...iconProps} className="w-4 h-4 text-rose-400" />;
+    case 'trophy':
+      return <Trophy {...iconProps} className="w-4 h-4 text-teal-400" />;
+    case 'smartphone':
+      return <Smartphone {...iconProps} className="w-4 h-4 text-blue-400" />;
+    default:
+      return <Tag {...iconProps} className="w-4 h-4 text-slate-400" />;
+  }
 }
 
 export function LobbyScreen({
@@ -87,53 +122,48 @@ export function LobbyScreen({
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
       {/* Room Code Card */}
-      <div className="w-full bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden mb-6">
-        <div className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-1">
-          Invite Friends with Room Code
-        </div>
-        <div className="flex items-center justify-center gap-3 my-2">
-          <span className="text-5xl sm:text-6xl font-black font-mono tracking-widest bg-gradient-to-r from-amber-300 via-rose-300 to-indigo-300 bg-clip-text text-transparent">
+      <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-5 text-center shadow-sm backdrop-blur-md mb-4">
+        <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">
+          Room Code
+        </span>
+        <div className="flex items-center justify-center gap-3 my-1">
+          <span className="text-4xl sm:text-5xl font-mono font-bold tracking-widest text-slate-100">
             {gameState.code}
           </span>
           <button
             onClick={copyCode}
-            title="Copy code"
-            className="p-3 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-2xl text-slate-300 transition-colors"
+            title="Copy room code"
+            className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 rounded-xl text-slate-300 transition-colors"
           >
-            {copied ? <Check className="w-6 h-6 text-emerald-400" /> : <Copy className="w-6 h-6" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
           </button>
         </div>
-        <p className="text-xs text-slate-400 mt-2">
-          Friends can enter this code on their phones/laptops to play together in real-time!
+        <p className="text-[11px] text-slate-400 mt-1">
+          Share this code with players to join from their phone or browser.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="w-full mb-4 p-3 bg-rose-500/15 border border-rose-500/40 rounded-xl text-rose-300 text-sm text-center flex items-center justify-center gap-2">
-          <ShieldAlert className="w-4 h-4 shrink-0" />
+        <div className="w-full mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs text-center flex items-center justify-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      {/* Prominent AI Bots Banner / Controls for Host */}
+      {/* AI Companions Section */}
       {isHost && (
-        <div className="w-full bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-slate-900 border border-indigo-500/30 rounded-3xl p-5 shadow-xl mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center shrink-0 text-xl shadow-md">
-                🤖
+        <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-sm mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-slate-100 text-base">
-                    Solo or Missing Players?
-                  </h3>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
-                    AI Companions
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Add smart AI bots who submit realistic clues and vote intelligently.
+                <h3 className="font-semibold text-slate-200 text-xs sm:text-sm">
+                  Add AI Bots
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Play solo or fill empty spots with human-like bots.
                 </p>
               </div>
             </div>
@@ -144,21 +174,21 @@ export function LobbyScreen({
                 type="button"
                 onClick={onAddBot}
                 disabled={playerCount >= 12}
-                className="py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all disabled:opacity-50"
+                className="py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>+ Add 1 AI Bot</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add 1 Bot</span>
               </button>
 
               {playerCount < 4 && (
                 <button
                   type="button"
                   onClick={addBotsToMin}
-                  className="py-2.5 px-3.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 font-bold text-xs flex items-center gap-1.5 transition-all"
+                  className="py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-1.5 transition-colors"
                   title="Fills the room with enough bots so you can start right now"
                 >
-                  <Zap className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Auto-Fill to 4</span>
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Fill to 4</span>
                 </button>
               )}
             </div>
@@ -166,44 +196,37 @@ export function LobbyScreen({
         </div>
       )}
 
-      {/* Word Categories Selection Section */}
-      <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl mb-6">
-        <div className="flex items-center justify-between mb-3">
+      {/* Word Categories Section */}
+      <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-sm mb-4">
+        <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-amber-500/20 text-amber-300 rounded-lg border border-amber-500/30">
-              <Tag className="w-4 h-4" />
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+              Secret Word Categories
             </span>
-            <div>
-              <h3 className="font-bold text-slate-100 text-sm sm:text-base flex items-center gap-2">
-                <span>Secret Word Categories</span>
-                <span className="text-xs font-semibold px-2 py-0.5 bg-slate-800 text-amber-300 rounded-full border border-slate-700">
-                  {enabledCategories.length} Active
-                </span>
-              </h3>
-            </div>
+            <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">
+              {enabledCategories.length} Active
+            </span>
           </div>
 
           {isHost && (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={selectAllCategories}
-                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-              >
-                Select All
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={selectAllCategories}
+              className="text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-colors"
+            >
+              Select All
+            </button>
           )}
         </div>
 
-        <p className="text-xs text-slate-400 mb-3">
+        <p className="text-[11px] text-slate-400 mb-2.5">
           {isHost
-            ? 'Toggle categories on or off below based on your group’s interests and knowledge:'
-            : 'Active categories chosen by the host for this match:'}
+            ? 'Choose which topics will appear in this room:'
+            : 'Categories active for this room:'}
         </p>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
           {CATEGORIES_LIST.map((cat) => {
             const isEnabled = enabledCategories.includes(cat.name);
             return (
@@ -212,33 +235,32 @@ export function LobbyScreen({
                 type="button"
                 disabled={!isHost}
                 onClick={() => toggleCategory(cat.name)}
-                className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-2.5 ${
+                className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-2 ${
                   isEnabled
-                    ? 'bg-slate-800/90 border-slate-700 hover:border-indigo-500/60 shadow-sm'
-                    : 'bg-slate-950/40 border-slate-800/60 opacity-50'
-                } ${isHost ? 'cursor-pointer hover:scale-[1.01]' : 'cursor-default'}`}
+                    ? 'bg-slate-850 border-slate-700 hover:border-slate-600'
+                    : 'bg-slate-950/40 border-slate-800/60 opacity-40'
+                } ${isHost ? 'cursor-pointer' : 'cursor-default'}`}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-2xl shrink-0">{cat.icon}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1 rounded-md bg-slate-800/80 shrink-0">
+                    <CategoryIcon iconKey={cat.iconKey} />
+                  </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-xs sm:text-sm text-slate-100 truncate">
+                    <div className="font-semibold text-xs text-slate-200 truncate">
                       {cat.name}
-                    </div>
-                    <div className="text-[10px] text-slate-400 truncate hidden sm:block">
-                      {cat.description}
                     </div>
                   </div>
                 </div>
 
                 {isHost && (
                   <div
-                    className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
                       isEnabled
-                        ? 'bg-indigo-600 border-indigo-400 text-white'
-                        : 'border-slate-700 bg-slate-800/60 text-transparent'
+                        ? 'bg-rose-600 border-rose-500 text-white'
+                        : 'border-slate-700 bg-slate-900 text-transparent'
                     }`}
                   >
-                    {isEnabled && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                    {isEnabled && <Check className="w-3 h-3 stroke-[3]" />}
                   </div>
                 )}
               </button>
@@ -248,15 +270,14 @@ export function LobbyScreen({
       </div>
 
       {/* Players Section */}
-      <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-sm mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-100 text-lg">Players in Room</span>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              {playerCount} / 12
+            <span className="font-bold text-slate-200 text-xs sm:text-sm uppercase tracking-wider">
+              Players ({playerCount} / 12)
             </span>
             {botsCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700">
                 {botsCount} {botsCount === 1 ? 'Bot' : 'Bots'}
               </span>
             )}
@@ -265,47 +286,48 @@ export function LobbyScreen({
           {isHost && (
             <button
               onClick={() => setShowSettingsModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors border border-slate-700"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-xs font-medium text-slate-300 transition-colors border border-slate-700"
             >
-              <Settings className="w-3.5 h-3.5" />
+              <SlidersHorizontal className="w-3 h-3 text-slate-400" />
               <span>Timers</span>
             </button>
           )}
         </div>
 
         {/* Players Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {gameState.players.map((player) => (
             <div
               key={player.id}
-              className="bg-slate-800/70 border border-slate-700/70 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-sm relative group"
+              className="bg-slate-950/60 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between gap-2"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div
-                  className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${player.color} flex items-center justify-center text-xl shrink-0 shadow-md`}
-                >
-                  {player.avatar}
-                </div>
+              <div className="flex items-center gap-2 min-w-0">
+                <PlayerAvatar
+                  avatar={player.avatar}
+                  color={player.color}
+                  name={player.name}
+                  size="sm"
+                />
+
                 <div className="min-w-0">
-                  <div className="font-semibold text-sm text-slate-100 truncate flex items-center gap-1">
-                    <span>{player.name}</span>
+                  <div className="font-semibold text-xs text-slate-200 truncate flex items-center gap-1">
+                    <span className="truncate">{player.name}</span>
                     {player.id === gameState.myPlayer?.id && (
-                      <span className="text-[10px] text-indigo-400 font-bold">(You)</span>
+                      <span className="text-[9px] text-rose-400 font-bold">(You)</span>
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {player.isHost && (
-                      <span className="flex items-center gap-0.5 text-[10px] font-semibold text-amber-400">
-                        <Crown className="w-3 h-3" /> Host
+                      <span className="flex items-center gap-0.5 text-[9px] font-semibold text-amber-400">
+                        <Crown className="w-2.5 h-2.5" /> Host
                       </span>
                     )}
                     {player.isBot && (
-                      <span className="flex items-center gap-0.5 text-[10px] font-semibold text-cyan-400">
-                        <Bot className="w-3 h-3" /> AI Bot
+                      <span className="flex items-center gap-0.5 text-[9px] font-medium text-slate-400">
+                        <Bot className="w-2.5 h-2.5" /> Bot
                       </span>
                     )}
-                    <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-300 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                      <Trophy className="w-2.5 h-2.5 text-amber-400" />
+                    <span className="text-[9px] font-bold text-slate-400 font-mono">
                       {player.score || 0} {(player.score || 0) === 1 ? 'pt' : 'pts'}
                     </span>
                   </div>
@@ -318,58 +340,51 @@ export function LobbyScreen({
                   type="button"
                   onClick={() => onRemoveBot(player.id)}
                   title="Remove bot"
-                  className="p-1 rounded-lg bg-slate-700/60 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors"
+                  className="p-1 rounded-md text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           ))}
 
-          {/* Interactive "Add AI Bot" Empty Seat Card */}
+          {/* Interactive "Add AI Bot" Button */}
           {isHost && playerCount < 12 && (
             <button
               type="button"
               onClick={onAddBot}
-              className="border-2 border-dashed border-indigo-500/40 hover:border-indigo-400/80 bg-indigo-950/20 hover:bg-indigo-900/30 rounded-2xl p-3 flex items-center justify-center gap-2 text-indigo-300 hover:text-indigo-200 transition-all text-xs font-bold group"
+              className="border border-dashed border-slate-700 hover:border-slate-600 bg-slate-950/30 hover:bg-slate-900/50 rounded-xl p-2.5 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 transition-all text-xs font-medium"
             >
-              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 group-hover:scale-110 flex items-center justify-center transition-transform">
-                <Plus className="w-4 h-4 text-indigo-400" />
-              </div>
-              <span>Add AI Player</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Bot</span>
             </button>
           )}
         </div>
 
         {!canStart && (
-          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300/90 text-xs text-center flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 shrink-0 text-amber-400" />
-            <span>
-              Need at least <b>3 players</b> to start.{' '}
-              {isHost ? (
-                <span>
-                  Click <b className="text-white">"+ Add 1 AI Bot"</b> or <b className="text-white">"Auto-Fill to 4"</b> above to play immediately!
-                </span>
-              ) : (
-                'Waiting for host to add players or start.'
-              )}
-            </span>
+          <div className="mt-3 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-400 text-xs text-center">
+            Need at least <b className="text-slate-200">3 players</b> to start.{' '}
+            {isHost && (
+              <span>
+                Click <b className="text-slate-200">"Add 1 Bot"</b> or <b className="text-slate-200">"Fill to 4"</b> above to play right away.
+              </span>
+            )}
           </div>
         )}
       </div>
 
-      {/* Tournament Standings in Lobby (if any games have concluded) */}
+      {/* Tournament Standings in Lobby */}
       {gameState.players.some((p) => (p.score || 0) > 0) && (
-        <div className="w-full mb-6">
+        <div className="w-full mb-4">
           <Leaderboard
             players={gameState.players}
             myPlayerId={gameState.myPlayer?.id}
             showRecentGain={false}
-            title="Tournament Leaderboard"
-            subtitle="Current cumulative standings across games played in this room"
+            title="Tournament Standings"
+            subtitle="Cumulative points across games played in this room"
           />
           {isHost && onResetScores && (
-            <div className="flex justify-end mt-2">
+            <div className="flex justify-end mt-1.5">
               <button
                 type="button"
                 onClick={() => {
@@ -377,7 +392,7 @@ export function LobbyScreen({
                     onResetScores();
                   }
                 }}
-                className="text-[11px] text-slate-500 hover:text-rose-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-rose-500/10"
+                className="text-[10px] text-slate-500 hover:text-rose-400 flex items-center gap-1 transition-colors px-2 py-0.5 rounded hover:bg-slate-800"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset Tournament Scores</span>
@@ -393,14 +408,14 @@ export function LobbyScreen({
           <button
             onClick={onStartGame}
             disabled={!canStart}
-            className="w-full py-4 px-6 bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full py-3.5 px-6 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors active:scale-[0.99]"
           >
-            <Play className="w-5 h-5 fill-current" />
-            <span>START GAME ({playerCount} Players)</span>
+            <Play className="w-4 h-4 fill-current" />
+            <span>Start Game ({playerCount} Players)</span>
           </button>
         ) : (
-          <div className="w-full py-4 px-6 bg-slate-900 border border-slate-800 rounded-2xl text-center text-slate-400 font-semibold flex items-center justify-center gap-2">
-            <span className="inline-block w-2.5 h-2.5 bg-indigo-500 rounded-full animate-ping" />
+          <div className="w-full py-3 px-6 bg-slate-900 border border-slate-800 rounded-xl text-center text-slate-400 text-xs font-medium flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-slate-400 animate-pulse" />
             <span>Waiting for Host to start the game...</span>
           </div>
         )}
@@ -408,25 +423,25 @@ export function LobbyScreen({
 
       {/* Settings Modal (Timers) */}
       {showSettingsModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-indigo-400" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-sm w-full shadow-xl">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+              <h3 className="font-bold text-sm text-slate-100 flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-slate-400" />
                 <span>Round Timer Settings</span>
               </h3>
               <button
                 onClick={() => setShowSettingsModal(false)}
-                className="text-slate-400 hover:text-slate-200 p-1"
+                className="text-slate-400 hover:text-slate-200 p-1 rounded-md hover:bg-slate-800 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {/* Clue Time */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                   Clue Submission Time
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -435,13 +450,13 @@ export function LobbyScreen({
                       key={sec}
                       type="button"
                       onClick={() => onUpdateSettings({ clueTime: sec })}
-                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                      className={`py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                         gameState.settings.clueTime === sec
-                          ? 'bg-indigo-600 border-indigo-400 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                          ? 'bg-rose-600 border-rose-500 text-white'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      {sec} seconds
+                      {sec}s
                     </button>
                   ))}
                 </div>
@@ -449,22 +464,22 @@ export function LobbyScreen({
 
               {/* Vote Time */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                   Voting Time
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[30, 40, 60].map((sec) => (
+                  {[20, 30, 45].map((sec) => (
                     <button
                       key={sec}
                       type="button"
                       onClick={() => onUpdateSettings({ voteTime: sec })}
-                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                      className={`py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                         gameState.settings.voteTime === sec
-                          ? 'bg-indigo-600 border-indigo-400 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                          ? 'bg-rose-600 border-rose-500 text-white'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      {sec} seconds
+                      {sec}s
                     </button>
                   ))}
                 </div>
@@ -473,7 +488,7 @@ export function LobbyScreen({
 
             <button
               onClick={() => setShowSettingsModal(false)}
-              className="mt-6 w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors"
+              className="mt-5 w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs rounded-xl transition-colors"
             >
               Done
             </button>

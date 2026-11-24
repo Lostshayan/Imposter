@@ -2,22 +2,22 @@ import { GameWord } from '../types/game';
 
 export interface CategoryInfo {
   name: string;
-  icon: string;
+  iconKey: 'film' | 'book' | 'sparkles' | 'utensils' | 'compass' | 'globe' | 'gamepad' | 'music' | 'trophy' | 'smartphone';
   description: string;
-  color: string;
+  accent: string;
 }
 
 export const CATEGORIES_LIST: CategoryInfo[] = [
-  { name: 'Movies & Cinema', icon: '🎬', description: 'Blockbuster films, iconic directors & cinema classics', color: 'from-amber-500 to-red-600' },
-  { name: 'Books & Literature', icon: '📚', description: 'Famous novels, classic literature & legendary characters', color: 'from-indigo-500 to-blue-600' },
-  { name: 'Famous Personalities', icon: '🌟', description: 'Celebrities, historical icons, scientists & athletes', color: 'from-yellow-400 to-amber-600' },
-  { name: 'Food & Culinary', icon: '🍕', description: 'Delicious dishes, street food, desserts & beverages', color: 'from-orange-500 to-rose-600' },
-  { name: 'Animals & Wildlife', icon: '🦁', description: 'Creatures of the land, ocean depths & skies', color: 'from-emerald-500 to-teal-600' },
-  { name: 'World Places & Travel', icon: '🌍', description: 'Wonders of the world, famous landmarks & destinations', color: 'from-cyan-500 to-blue-600' },
-  { name: 'Video Games & Gaming', icon: '🎮', description: 'Retro classics, modern hits & iconic gaming legends', color: 'from-purple-500 to-pink-600' },
-  { name: 'Music & Instruments', icon: '🎸', description: 'Instruments, bands, concerts & musical gear', color: 'from-rose-500 to-violet-600' },
-  { name: 'Sports & Fitness', icon: '⚽', description: 'Worldwide sports, tournaments, athletes & athletic gear', color: 'from-green-500 to-emerald-600' },
-  { name: 'Everyday Objects & Tech', icon: '📱', description: 'Gadgets, appliances, travel gear & modern tech', color: 'from-slate-500 to-zinc-600' },
+  { name: 'Movies & Cinema', iconKey: 'film', description: 'Films, directors & cinema classics', accent: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+  { name: 'Books & Literature', iconKey: 'book', description: 'Famous novels & literary characters', accent: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+  { name: 'Famous Personalities', iconKey: 'sparkles', description: 'Icons, scientists & leaders', accent: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' },
+  { name: 'Food & Culinary', iconKey: 'utensils', description: 'Dishes, street food & desserts', accent: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
+  { name: 'Animals & Wildlife', iconKey: 'compass', description: 'Creatures across land and sea', accent: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+  { name: 'World Places & Travel', iconKey: 'globe', description: 'Landmarks, monuments & wonders', accent: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
+  { name: 'Video Games & Gaming', iconKey: 'gamepad', description: 'Classics, modern hits & gaming icons', accent: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
+  { name: 'Music & Instruments', iconKey: 'music', description: 'Instruments, songs & musicians', accent: 'text-rose-400 bg-rose-500/10 border-rose-500/20' },
+  { name: 'Sports & Fitness', iconKey: 'trophy', description: 'Sports, athletes & tournaments', accent: 'text-teal-400 bg-teal-500/10 border-teal-500/20' },
+  { name: 'Everyday Objects & Tech', iconKey: 'smartphone', description: 'Everyday gadgets & inventions', accent: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
 ];
 
 export const ALL_CATEGORY_NAMES = CATEGORIES_LIST.map((c) => c.name);

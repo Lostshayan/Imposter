@@ -306,7 +306,7 @@ export function LobbyScreen({
                     )}
                     <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-300 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
                       <Trophy className="w-2.5 h-2.5 text-amber-400" />
-                      {player.score || 0} pts
+                      {player.score || 0} {(player.score || 0) === 1 ? 'pt' : 'pts'}
                     </span>
                   </div>
                 </div>

@@ -95,18 +95,18 @@ export function Leaderboard({
             <Award className="w-4 h-4 text-indigo-400" /> Point Distribution Rules:
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
               <span className="font-bold text-cyan-300 block mb-0.5">🎯 Civilians Catch Imposter</span>
               <span className="text-slate-300">
-                • <b className="text-emerald-400">+100 pts</b>: Correctly voted for Imposter
-                <br />• <b className="text-emerald-400">+50 pts</b>: Team victory support
+                • <b className="text-emerald-400">+1 point</b> to each Civilian
+                <br />• <b className="text-slate-400">0 points</b> to the Imposter
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-slate-800">
-              <span className="font-bold text-rose-300 block mb-0.5">😈 Imposter Deceives Room</span>
+            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span className="font-bold text-rose-300 block mb-0.5">😈 Imposter Wins</span>
               <span className="text-slate-300">
-                • <b className="text-amber-300">+200 pts</b>: Innocent Civilian voted out
-                <br />• <b className="text-amber-300">+150 pts</b>: Imposter survives max rounds
+                • <b className="text-amber-300">+1 point</b> to the Imposter
+                <br />• <b className="text-slate-400">0 points</b> to the Civilians
               </span>
             </div>
           </div>
@@ -201,7 +201,9 @@ export function Leaderboard({
                   <span className="text-base font-black font-mono text-amber-300 tracking-tight">
                     {player.score || 0}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-400 ml-1">pts</span>
+                  <span className="text-[10px] font-bold text-slate-400 ml-1">
+                    {(player.score || 0) === 1 ? 'pt' : 'pts'}
+                  </span>
                 </div>
               </div>
             </div>

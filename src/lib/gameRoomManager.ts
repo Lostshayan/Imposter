@@ -468,13 +468,11 @@ export class GameRoomManager {
         if (wasImposter) {
           room.winner = 'CIVILIANS';
           room.winReason = `The Imposter (${eliminatedPlayer.name}) was discovered and voted out! Civilians win!`;
-          // Distribute points: Civilians who voted for the imposter get 100, other civilians get 50, imposter gets 0
+          // Distribute points: 1 point to each civilian, 0 to imposter
           room.players.forEach((p) => {
             if (p.role === 'CIVILIAN') {
-              const votedForImposter = p.votedFor === eliminatedPlayer.id;
-              const gain = votedForImposter ? 100 : 50;
-              p.lastScoreGain = gain;
-              p.score = (p.score || 0) + gain;
+              p.lastScoreGain = 1;
+              p.score = (p.score || 0) + 1;
             } else {
               p.lastScoreGain = 0;
             }
@@ -483,12 +481,11 @@ export class GameRoomManager {
           // A Civilian was voted out by majority - game ends immediately!
           room.winner = 'IMPOSTER';
           room.winReason = `An innocent civilian (${eliminatedPlayer.name}) was wrongly voted out! The Imposter (${imposterNames}) deceived everyone and won!`;
-          // Distribute points: Imposter tricked the room and gets 200, civilians get 0
+          // Distribute points: 1 point to imposter, 0 to civilians
           room.players.forEach((p) => {
             if (p.role === 'IMPOSTER') {
-              const gain = 200;
-              p.lastScoreGain = gain;
-              p.score = (p.score || 0) + gain;
+              p.lastScoreGain = 1;
+              p.score = (p.score || 0) + 1;
             } else {
               p.lastScoreGain = 0;
             }
@@ -560,12 +557,11 @@ export class GameRoomManager {
       room.winner = 'IMPOSTER';
       room.winReason = `Tie votes reached max rounds! The Imposter survived undetected across all rounds!`;
       room.phase = 'GAME_OVER';
-      // Imposter survived max rounds: gets 150 survival points
+      // Imposter survived max rounds: gets 1 point
       room.players.forEach((p) => {
         if (p.role === 'IMPOSTER') {
-          const gain = 150;
-          p.lastScoreGain = gain;
-          p.score = (p.score || 0) + gain;
+          p.lastScoreGain = 1;
+          p.score = (p.score || 0) + 1;
         } else {
           p.lastScoreGain = 0;
         }

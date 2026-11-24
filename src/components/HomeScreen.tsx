@@ -217,7 +217,7 @@ export function HomeScreen({ onCreateRoom, onJoinRoom, onSoloPlay, errorMsg }: H
                   <div>
                     <h4 className="font-semibold text-slate-100">The Secret Word & Hint</h4>
                     <p className="text-slate-400 text-xs mt-0.5">
-                      Civilians get the exact secret word (e.g. <b>"Espresso"</b>). The secret Imposter only gets a vague hint (e.g. <b>"Morning Roast"</b>).
+                      Civilians get the exact secret word (e.g. <b>"Espresso"</b>). The secret Imposter only gets a simple hint (e.g. <b>"Strong Coffee"</b>).
                     </p>
                   </div>
                 </div>

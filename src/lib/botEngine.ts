@@ -67,26 +67,35 @@ function getHintBasedBluffs(hint: string): string[] {
   const lower = hint.toLowerCase();
   const bluffs: string[] = [];
 
-  if (lower.includes('slice') || lower.includes('roast') || lower.includes('baker') || lower.includes('street') || lower.includes('scoop')) {
-    bluffs.push('Comfort food vibes', 'Late night craving', 'Always delivers', 'Best with friends', 'Warm and savory', 'Delicious staple');
+  if (lower.includes('dish') || lower.includes('food') || lower.includes('coffee') || lower.includes('snack') || lower.includes('dessert') || lower.includes('pastry')) {
+    bluffs.push('Comfort food vibes', 'Late night craving', 'Always delivers', 'Best with friends', 'Warm and savory', 'Delicious staple', 'Such good flavor');
   }
-  if (lower.includes('voyage') || lower.includes('water') || lower.includes('ocean') || lower.includes('tank')) {
-    bluffs.push('Deep waters', 'Chilly atmosphere', 'Dramatic scale', 'Historic journey', 'High seas mystery', 'Cold horizon');
+  if (lower.includes('movie') || lower.includes('heist') || lower.includes('battles') || lower.includes('team') || lower.includes('virtual')) {
+    bluffs.push('Total blockbuster', 'High stakes drama', 'Intense visuals', 'Pure cinema classic', 'Big screen vibes', 'Edge of your seat');
   }
-  if (lower.includes('heist') || lower.includes('illusion') || lower.includes('code') || lower.includes('mind')) {
-    bluffs.push('Mind bending', 'High stakes', 'Complex layers', 'Keeps you guessing', 'Dark and clever', 'Twisted reality');
+  if (lower.includes('detective') || lower.includes('wizard') || lower.includes('lovers') || lower.includes('monster') || lower.includes('quest') || lower.includes('wonderland')) {
+    bluffs.push('Epic storyline', 'Legendary story', 'Unforgettable characters', 'Classic page turner', 'Deep fictional lore', 'Pure fantasy');
   }
-  if (lower.includes('screen') || lower.includes('shield') || lower.includes('stamp') || lower.includes('lens')) {
-    bluffs.push('Everyday essential', 'Modern staple', 'Never leave home without it', 'Daily companion', 'Super practical');
+  if (lower.includes('singer') || lower.includes('scientist') || lower.includes('star') || lower.includes('painter') || lower.includes('billionaire') || lower.includes('playwright') || lower.includes('legend')) {
+    bluffs.push('Global icon', 'Huge worldwide fame', 'Legendary talent', 'Inspiring figure', 'Changed history', 'Household name');
   }
-  if (lower.includes('court') || lower.includes('squares') || lower.includes('speed') || lower.includes('legend')) {
-    bluffs.push('High intensity', 'Fast reflexes', 'Competitive energy', 'Pure focus', 'Peak performance');
+  if (lower.includes('animal') || lower.includes('bird') || lower.includes('lizard') || lower.includes('creature') || lower.includes('mammal')) {
+    bluffs.push('Fascinating creature', 'Wild and free', 'Natural beauty', 'Rare wildlife sighting', 'Unique animal', 'Nature documentary star');
   }
-  if (lower.includes('strings') || lower.includes('keys') || lower.includes('disc') || lower.includes('mixer')) {
-    bluffs.push('Timeless rhythm', 'Great sound', 'Iconic melody', 'Pure vibe', 'Vintage feel');
+  if (lower.includes('landmark') || lower.includes('monument') || lower.includes('tombs') || lower.includes('statue') || lower.includes('arena') || lower.includes('palace')) {
+    bluffs.push('Must visit destination', 'World famous sight', 'Huge tourist crowd', 'Incredible architecture', 'Bucket list trip', 'Historic landmark');
   }
-  if (lower.includes('waddle') || lower.includes('jumper') || lower.includes('colors') || lower.includes('nap')) {
-    bluffs.push('Wild and free', 'Natural beauty', 'Rare sighting', 'Fascinating behavior', 'Pure wildlife');
+  if (lower.includes('game') || lower.includes('puzzle') || lower.includes('arcade') || lower.includes('nintendo')) {
+    bluffs.push('Addictive gameplay', 'Nostalgic gaming', 'Childhood favorite', 'High score challenge', 'Pure gaming fun', 'Total classic game');
+  }
+  if (lower.includes('instrument') || lower.includes('record') || lower.includes('mixer') || lower.includes('rock') || lower.includes('keyboard')) {
+    bluffs.push('Timeless rhythm', 'Great sound', 'Iconic melody', 'Pure acoustic vibe', 'Vintage feel', 'Musical masterpiece');
+  }
+  if (lower.includes('sport') || lower.includes('racing') || lower.includes('diving') || lower.includes('court')) {
+    bluffs.push('High intensity', 'Fast reflexes', 'Competitive energy', 'Pure athletic focus', 'Peak performance', 'Exciting match');
+  }
+  if (lower.includes('phone') || lower.includes('shield') || lower.includes('wheeler') || lower.includes('viewer') || lower.includes('document')) {
+    bluffs.push('Everyday essential', 'Modern staple', 'Never leave home without it', 'Daily companion', 'Super practical', 'Handy item');
   }
 
   return bluffs;

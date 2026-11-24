@@ -507,9 +507,10 @@ export class GameRoomManager {
           wasImposterEliminated: wasImposter,
         });
 
-        room.phase = 'VOTE_RESULTS';
-        room.phaseDuration = 8;
-        room.phaseEndTime = Date.now() + 8000;
+        // A player was voted out: End game immediately and show the winning results screen!
+        room.phase = 'GAME_OVER';
+        room.phaseDuration = 0;
+        room.phaseEndTime = null;
 
         return room;
       }
@@ -524,9 +525,27 @@ export class GameRoomManager {
       clues: roundClues,
     });
 
+    if (room.round >= room.settings.maxRounds) {
+      room.winner = 'IMPOSTER';
+      const imposterNames = room.players.filter((p) => p.role === 'IMPOSTER').map((p) => p.name).join(', ') || 'The Imposter';
+      room.winReason = `No majority reached after ${room.settings.maxRounds} rounds! The Imposter (${imposterNames}) survived undetected and won!`;
+      room.players.forEach((p) => {
+        if (p.role === 'IMPOSTER') {
+          p.lastScoreGain = 1;
+          p.score = (p.score || 0) + 1;
+        } else {
+          p.lastScoreGain = 0;
+        }
+      });
+      room.phase = 'GAME_OVER';
+      room.phaseDuration = 0;
+      room.phaseEndTime = null;
+      return room;
+    }
+
     room.phase = 'VOTE_RESULTS';
-    room.phaseDuration = 7;
-    room.phaseEndTime = Date.now() + 7000;
+    room.phaseDuration = 3;
+    room.phaseEndTime = Date.now() + 3000;
     return room;
   }
 

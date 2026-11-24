@@ -214,7 +214,10 @@ app.prepare().then(() => {
         const room = gameManager.getRoom(code);
         if (room && room.phase === 'VOTING') {
           gameManager.tallyVotes(code);
-          scheduleResultsTimer(ioServer, code, 7);
+          const updated = gameManager.getRoom(code);
+          if (updated && updated.phase === 'VOTE_RESULTS') {
+            scheduleResultsTimer(ioServer, code, 3);
+          }
         }
       });
     }
@@ -278,7 +281,9 @@ app.prepare().then(() => {
         broadcastRoom(io, roomCode);
         if (result.allVoted) {
           clearRoomTimer(roomCode);
-          scheduleResultsTimer(io, roomCode, 7);
+          if (result.room.phase === 'VOTE_RESULTS') {
+            scheduleResultsTimer(io, roomCode, 3);
+          }
         }
       }
     });

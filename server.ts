@@ -1,4 +1,5 @@
-import { createServer } from 'http';
+import http, { createServer } from 'http';
+import https from 'https';
 import { parse } from 'url';
 import next from 'next';
 import { Server as SocketIOServer, Socket } from 'socket.io';
@@ -76,6 +77,24 @@ app.prepare().then(() => {
   const httpServer = createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url || '', true);
+      const { pathname } = parsedUrl;
+
+      // Ultra-fast lightweight health check endpoint for Keep-Alive & Uptime monitors
+      if (pathname === '/api/health' || pathname === '/api/ping' || pathname === '/health') {
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        });
+        res.end(
+          JSON.stringify({
+            status: 'ok',
+            uptime: Math.floor(process.uptime()),
+            timestamp: new Date().toISOString(),
+          })
+        );
+        return;
+      }
+
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error handling request:', err);
@@ -349,5 +368,34 @@ app.prepare().then(() => {
     console.log(`> Local:   http://localhost:${port}`);
     console.log(`> Network: http://${localIp}:${port} (join from mobile)`);
     console.log(`==================================================\n`);
+
+    // Automated Keep-Alive for Render / Cloud (prevents 15-minute free tier spin-down)
+    const targetKeepAliveUrl =
+      process.env.RENDER_EXTERNAL_URL ||
+      process.env.KEEP_ALIVE_URL ||
+      process.env.APP_URL;
+
+    if (targetKeepAliveUrl) {
+      const pingEndpoint = `${targetKeepAliveUrl.replace(/\/$/, '')}/api/health`;
+      console.log(`⏱️ [Keep-Alive] Configured to ping: ${pingEndpoint} every 10 minutes`);
+
+      // Ping every 10 minutes (600,000 ms) to keep instance awake
+      setInterval(() => {
+        try {
+          const client = pingEndpoint.startsWith('https') ? https : http;
+          client
+            .get(pingEndpoint, (res) => {
+              console.log(
+                `[Keep-Alive] Self-ping returned ${res.statusCode} at ${new Date().toISOString()}`
+              );
+            })
+            .on('error', (err) => {
+              console.warn(`[Keep-Alive] Ping warning:`, err.message);
+            });
+        } catch {
+          // ignore
+        }
+      }, 10 * 60 * 1000);
+    }
   });
 });

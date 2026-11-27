@@ -69,7 +69,7 @@ export function RoleRevealScreen({ gameState, timeLeft, onProceed }: RoleRevealS
                 <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
                   Your Category Hint:
                 </div>
-                <div className="text-sm font-bold text-amber-300 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                <div className="text-xl sm:text-2xl font-black text-amber-300 bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-center">
                   "{gameState.myHint}"
                 </div>
               </div>
@@ -97,7 +97,7 @@ export function RoleRevealScreen({ gameState, timeLeft, onProceed }: RoleRevealS
                 <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-0.5">
                   The Secret Word is:
                 </div>
-                <div className="text-2xl font-black text-slate-100 my-0.5">
+                <div className="text-3xl font-black text-slate-100 my-1">
                   {gameState.mySecretWord}
                 </div>
               </div>
@@ -115,7 +115,7 @@ export function RoleRevealScreen({ gameState, timeLeft, onProceed }: RoleRevealS
         {isHost ? (
           <button
             onClick={onProceed}
-            className="w-full py-3 px-5 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3.5 px-5 bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white font-bold text-sm rounded-xl border border-rose-500 shadow-sm flex items-center justify-center gap-2 transition-all"
           >
             <span>Proceed to Clues ({timeLeft}s)</span>
             <ArrowRight className="w-4 h-4" />

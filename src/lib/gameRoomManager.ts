@@ -218,8 +218,8 @@ export class GameRoomManager {
     const activePlayer = room.players.find((p) => p.id === room.currentTurnPlayerId);
     if (!activePlayer || !activePlayer.isBot || !activePlayer.isAlive) return;
 
-    // Realistic delay before bot submits (1.0s - 1.8s)
-    const delay = 1000 + Math.random() * 800;
+    // Realistic human-like delay before bot submits (1.8s - 3.8s)
+    const delay = 1800 + Math.random() * 2000;
     setTimeout(() => {
       const liveRoom = this.getRoom(room.code);
       if (

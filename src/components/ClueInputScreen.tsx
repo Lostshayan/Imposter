@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Send, CheckCircle2, AlertCircle, Sparkles, Fingerprint, ShieldCheck } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, Fingerprint, ShieldCheck, Clock } from 'lucide-react';
 import { ClientGameState } from '../types/game';
 import { PlayerAvatar } from './PlayerAvatar';
 
@@ -25,12 +25,9 @@ export function ClueInputScreen({ gameState, timeLeft, onSubmitClue }: ClueInput
 
   const turnOrderPlayers = (gameState.turnOrder || [])
     .map((id) => gameState.players.find((p) => p.id === id))
-    .filter(Boolean);
+    .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
-  // Clues already submitted this round
   const submittedClues = gameState.players.filter((p) => p.clue !== null && p.clue !== undefined);
-
-  // Client duplicate check
   const trimmed = clueText.trim().toLowerCase();
   const duplicate = trimmed
     ? submittedClues.find((p) => p.clue && p.clue.trim().toLowerCase() === trimmed)
@@ -41,225 +38,222 @@ export function ClueInputScreen({ gameState, timeLeft, onSubmitClue }: ClueInput
     setLocalError(null);
 
     if (!isMyTurn) {
-      setLocalError("It is not your turn yet! Please wait for your turn.");
+      setLocalError('Wait for your turn.');
       return;
     }
 
     if (!clueText.trim()) return;
 
     if (duplicate) {
-      setLocalError(`The clue "${clueText.trim()}" was already submitted by ${duplicate.name}! Every clue must be unique.`);
+      setLocalError(`"${clueText.trim()}" was already used by ${duplicate.name}.`);
       return;
     }
 
     onSubmitClue(clueText.trim(), (res) => {
       if (res && !res.success && res.error) {
         setLocalError(res.error);
+      } else {
+        setClueText('');
       }
     });
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto flex flex-col items-center">
-      {/* Secret Word / Hint Reminder Banner */}
-      <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-sm mb-4 backdrop-blur-md">
-        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-          <span className="font-semibold uppercase tracking-wider">
-            {gameState.currentCategory || 'General'}
-          </span>
-          <span className="font-mono text-slate-400">Round {gameState.round}</span>
+    <div className="w-full max-w-3xl mx-auto flex flex-col items-center gap-4 sm:gap-5">
+      {/* 1. Clean Hero Secret Card */}
+      <div className="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 mb-1">
+            {isImposter ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-400">
+                <Fingerprint className="w-4 h-4" />
+                <span>You are the Imposter • Hint</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Secret Word</span>
+              </span>
+            )}
+          </div>
+
+          <div
+            className={`text-2xl sm:text-3xl font-black tracking-tight ${
+              isImposter ? 'text-amber-300' : 'text-slate-100'
+            }`}
+          >
+            {isImposter ? `"${gameState.myHint}"` : gameState.mySecretWord}
+          </div>
         </div>
 
-        {isImposter ? (
-          <div>
-            <div className="text-xs font-bold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
-              <Fingerprint className="w-4 h-4" />
-              <span>You are the Imposter • Category Hint:</span>
+        <div className="flex items-center gap-2 self-start sm:self-center">
+          <span className="px-3 py-1 rounded-lg bg-slate-950/70 border border-slate-800 text-xs font-semibold text-slate-300">
+            {gameState.currentCategory || 'General'}
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-950/70 border border-slate-800 text-xs font-mono text-slate-400">
+            {submittedClues.length}/{turnOrderPlayers.length}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Turn Action Area (Focused & Uncluttered) */}
+      <div className="w-full">
+        {isMyTurn ? (
+          <form
+            onSubmit={handleSubmit}
+            className="w-full bg-slate-900/90 border border-rose-500/40 ring-1 ring-rose-500/20 rounded-2xl p-4 shadow-md space-y-3 animate-fade-in"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-rose-400 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                <span>Your Turn — Drop a 1–2 word clue</span>
+              </span>
+              <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                {timeLeft}s
+              </span>
             </div>
-            <div className="text-sm font-bold text-amber-300 mt-1 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
-              "{gameState.myHint}"
+
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  autoFocus
+                  maxLength={60}
+                  placeholder="Type your clue..."
+                  value={clueText}
+                  onChange={(e) => {
+                    setClueText(e.target.value);
+                    setLocalError(null);
+                  }}
+                  className={`w-full bg-slate-950 border rounded-xl px-4 py-3 text-base font-semibold text-slate-100 placeholder-slate-500 focus:outline-none transition-colors ${
+                    duplicate
+                      ? 'border-rose-500 ring-1 ring-rose-500/30'
+                      : 'border-slate-700 focus:border-rose-500'
+                  }`}
+                />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-500 font-mono">
+                  {clueText.length}/60
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!clueText.trim() || !!duplicate}
+                className="py-3 px-6 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all shrink-0"
+              >
+                <Send className="w-4 h-4" />
+                <span>Submit Clue</span>
+              </button>
             </div>
-          </div>
+
+            {(duplicate || localError) && (
+              <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>
+                  {duplicate
+                    ? `"${duplicate.clue}" was already submitted by ${duplicate.name}.`
+                    : localError}
+                </span>
+              </div>
+            )}
+          </form>
         ) : (
-          <div>
-            <div className="text-xs font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Secret Word:</span>
+          <div className="w-full py-2.5 px-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-between text-xs sm:text-sm text-slate-300">
+            <div className="flex items-center gap-2">
+              {hasSubmitted ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    Clue locked in • Waiting for <b className="text-slate-100">{activePlayer?.name || 'next player'}</b>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+                  <span>
+                    <b className="text-slate-100">{activePlayer?.name || 'Player'}</b> is thinking...
+                  </span>
+                </>
+              )}
             </div>
-            <div className="text-2xl font-black text-slate-100 tracking-wide mt-0.5">
-              {gameState.mySecretWord}
-            </div>
+            <span className="font-mono font-bold text-slate-400 shrink-0">{timeLeft}s</span>
           </div>
         )}
       </div>
 
-      {/* Turn Order Tracker Sequence */}
-      <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-3 shadow-sm mb-3.5 sm:mb-4 overflow-x-auto no-scrollbar">
-        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
-          <span className="font-bold uppercase tracking-wider text-[10px]">Clue Submission Sequence</span>
-          <span className="font-mono text-slate-400">
-            {submittedClues.length} of {turnOrderPlayers.length} Submitted
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1.5 min-w-max">
+      {/* 3. Big Rectangular Clue Grid */}
+      <div className="w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {turnOrderPlayers.map((player, idx) => {
-            if (!player) return null;
+            const isMe = player.id === myPlayer?.id;
             const isTurn = player.id === currentTurnPlayerId;
-            const isDone = player.hasSubmittedClue;
+            const isDone = player.hasSubmittedClue && player.clue;
 
             return (
               <div
                 key={player.id}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                  isTurn
-                    ? 'bg-rose-500/10 border-rose-500/50 text-rose-300 ring-1 ring-rose-500/30'
-                    : isDone
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
+                className={`min-h-[118px] sm:min-h-[132px] rounded-2xl p-3.5 sm:p-4 border flex flex-col justify-between transition-all ${
+                  isDone
+                    ? 'bg-slate-900/90 border-slate-700/80 shadow-sm animate-clue-register'
+                    : isTurn
+                    ? 'bg-rose-950/15 border-rose-500/60 ring-1 ring-rose-500/25'
+                    : 'bg-slate-900/40 border-dashed border-slate-800/80 opacity-65'
                 }`}
               >
-                <PlayerAvatar
-                  avatar={player.avatar}
-                  color={player.color}
-                  name={player.name}
-                  size="xs"
-                />
-                <span className="truncate max-w-[85px]">{player.name}</span>
-                {isDone ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                ) : isTurn ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping shrink-0" />
-                ) : (
-                  <span className="text-[10px] text-slate-500 font-mono">#{idx + 1}</span>
-                )}
+                {/* Top: Avatar, Name & Status */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <PlayerAvatar
+                      avatar={player.avatar}
+                      color={player.color}
+                      name={player.name}
+                      size="sm"
+                    />
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs sm:text-sm text-slate-200 truncate">
+                        {player.name}
+                      </div>
+                      {isMe && (
+                        <span className="text-[10px] font-bold text-rose-400 block leading-none mt-0.5">
+                          You
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {isDone ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : isTurn ? (
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0" />
+                  ) : (
+                    <span className="text-[11px] font-mono text-slate-500 shrink-0">#{idx + 1}</span>
+                  )}
+                </div>
+
+                {/* Bottom/Center: Big Visible Clue Word or Waiting State */}
+                <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center min-h-[44px]">
+                  {isDone ? (
+                    <p
+                      key={player.clue}
+                      className="text-base sm:text-lg font-extrabold text-slate-100 leading-snug break-words animate-clue-word"
+                    >
+                      {player.clue}
+                    </p>
+                  ) : isTurn ? (
+                    <span className="text-xs sm:text-sm font-semibold text-rose-300 animate-pulse">
+                      {isMe ? 'Your turn...' : 'Typing clue...'}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-medium text-slate-500 italic">
+                      Waiting...
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
-      </div>
-
-      {/* Turn Status Alert Banner */}
-      <div className="w-full mb-4">
-        {isMyTurn ? (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/40 rounded-xl text-center">
-            <span className="font-bold text-rose-300 text-xs sm:text-sm flex items-center justify-center gap-1.5">
-              <span>It is your turn to submit a clue ({timeLeft}s)</span>
-            </span>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Type a unique word or clue that hasn't been submitted yet.
-            </p>
-          </div>
-        ) : (
-          <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-center flex items-center justify-center gap-2 text-xs text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping shrink-0" />
-            <span>
-              Waiting for <b className="text-slate-200">{activePlayer?.name || 'player'}</b> to type ({timeLeft}s)...
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Active Turn Form or Waiting State */}
-      <div className="w-full mb-4">
-        {isMyTurn ? (
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="relative">
-              <input
-                type="text"
-                autoFocus
-                maxLength={60}
-                placeholder="Type your 1-3 word clue..."
-                value={clueText}
-                onChange={(e) => {
-                  setClueText(e.target.value);
-                  setLocalError(null);
-                }}
-                className={`w-full bg-slate-950 border rounded-xl px-4 py-3 text-base font-semibold text-slate-100 placeholder-slate-500 focus:outline-none transition-colors ${
-                  duplicate
-                    ? 'border-rose-500 ring-1 ring-rose-500/30'
-                    : 'border-slate-800 focus:border-rose-500/60'
-                }`}
-              />
-              <span className="absolute right-3.5 bottom-3 text-[10px] text-slate-500 font-mono">
-                {clueText.length}/60
-              </span>
-            </div>
-
-            {duplicate && (
-              <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                <span>
-                  <b>Duplicate:</b> "{duplicate.clue}" was already given by {duplicate.name}. Clues must be unique.
-                </span>
-              </div>
-            )}
-
-            {localError && !duplicate && (
-              <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                <span>{localError}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={!clueText.trim() || !!duplicate}
-              className="w-full py-3.5 px-5 bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Submit Clue</span>
-            </button>
-          </form>
-        ) : hasSubmitted ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-center flex flex-col items-center">
-            <CheckCircle2 className="w-6 h-6 text-emerald-400 mb-1" />
-            <span className="font-semibold text-slate-200 text-xs">Your clue is locked in:</span>
-            <div className="mt-1 text-xs italic font-medium text-slate-200 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
-              "{myPlayer?.clue}"
-            </div>
-          </div>
-        ) : (
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 text-center text-xs text-slate-500">
-            Waiting for your turn in the sequence.
-          </div>
-        )}
-      </div>
-
-      {/* Live Submitted Clues Feed */}
-      <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
-          <span>Submitted Clues ({submittedClues.length})</span>
-          <span className="text-[10px] text-slate-500">All clues must be unique</span>
-        </h3>
-
-        {submittedClues.length === 0 ? (
-          <div className="text-center text-xs text-slate-500 py-3 italic">
-            Waiting for the first player to submit...
-          </div>
-        ) : (
-          <div className="space-y-1.5">
-            {submittedClues.map((player) => (
-              <div
-                key={player.id}
-                className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800/80 text-xs"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <PlayerAvatar
-                    avatar={player.avatar}
-                    color={player.color}
-                    name={player.name}
-                    size="xs"
-                  />
-                  <span className="font-semibold text-slate-200 truncate">{player.name}</span>
-                </div>
-                <div className="italic text-slate-100 font-medium bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">
-                  "{player.clue}"
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

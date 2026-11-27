@@ -406,6 +406,18 @@ export class GameRoomManager {
     voter.votedFor = targetId;
 
     const alivePlayers = room.players.filter((p) => p.isAlive);
+
+    // Update live vote counts in real time
+    const liveCounts: Record<string, number> = {};
+    alivePlayers.forEach((p) => {
+      if (p.votedFor && p.votedFor !== 'SKIP') {
+        liveCounts[p.votedFor] = (liveCounts[p.votedFor] || 0) + 1;
+      }
+    });
+    alivePlayers.forEach((p) => {
+      p.votesReceived = liveCounts[p.id] || 0;
+    });
+
     const allVoted = alivePlayers.every((p) => p.votedFor !== null);
 
     if (allVoted) {
